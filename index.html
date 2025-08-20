@@ -1,0 +1,854 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>KCNA Learning — Cloud Native & Kubernetes</title>
+  <style>
+    :root{
+      --bg: #0b1220;
+      --panel: #0f172a;
+      --panel-2:#111827;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --brand:#22d3ee;
+      --brand-2:#60a5fa;
+      --ok:#10b981;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --code-bg:#0a0f1a;
+      --code-border:#1f2937;
+      --chip:#1f2937;
+      --link:#7dd3fc;
+      --focus:#f59e0b;
+      --shadow: 0 10px 25px rgba(0,0,0,.35);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --maxw: 1200px;
+      --navw: 280px;
+      --font: ui-sans-serif,System-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+      --mono: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,monospace;
+    }
+    @media (prefers-color-scheme: light) {
+      :root{
+        --bg:#f8fafc; --panel:#ffffff; --panel-2:#f1f5f9; --text:#0f172a; --muted:#475569;
+        --code-bg:#0f172a; --code-border:#e2e8f0; --chip:#e2e8f0; --link:#0369a1; --shadow: 0 10px 25px rgba(2,6,23,.08);
+      }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    html, body { overflow-x: hidden; }
+    body{
+      margin:0; font-family:var(--font); background:linear-gradient(180deg, var(--bg), var(--panel-2) 1200px); color:var(--text);
+      max-width:100%;
+    }
+    a{color:var(--link); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .app{
+      display:grid; grid-template-columns: var(--navw) 1fr; gap:20px; max-width: var(--maxw); margin:0 auto; padding:0 16px 64px;
+      width:100%;
+    }
+    header.hero{
+      grid-column: 1/-1; margin:16px auto 8px; width:100%; max-width:var(--maxw);
+      background: radial-gradient(1200px 400px at 20% -40%, rgba(34,211,238,.25), transparent 60%),
+                  radial-gradient(1200px 400px at 80% -40%, rgba(96,165,250,.25), transparent 60%),
+                  linear-gradient(180deg, var(--panel), var(--panel-2));
+      border:1px solid rgba(148,163,184,.15);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .hero-inner{padding:24px 20px 18px}
+    .brand-row{display:flex; align-items:center; gap:12px; margin-bottom:8px; flex-wrap:wrap}
+    .logo{
+      width:40px; height:40px; border-radius:10px;
+      background: conic-gradient(from 200deg, var(--brand), var(--brand-2));
+      box-shadow: 0 0 0 4px rgba(255,255,255,.06), 0 8px 20px rgba(2,6,23,.3);
+      flex:0 0 auto;
+    }
+    h1{font-size: clamp(1.5rem, 2.4vw, 2.1rem); margin:0}
+    .subtitle{color:var(--muted); margin:6px 0 14px; line-height:1.5}
+    .toolbar{display:flex; flex-wrap:wrap; align-items:center; gap:10px}
+    .toolbar input[type="search"]{
+      flex:1 1 260px; min-width:220px; border-radius:999px; background:var(--panel-2);
+      border:1px solid rgba(148,163,184,.18); color:var(--text); padding:10px 14px;
+      outline:none;
+    }
+    .toolbar input[type="search"]:focus{border-color:var(--focus); box-shadow:0 0 0 3px rgba(245,158,11,.25)}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px; background:var(--chip);
+      border:1px solid rgba(148,163,184,.14); color:var(--text); font-size:.9rem; white-space:nowrap;
+    }
+    .jump-select{
+      appearance:none; -webkit-appearance:none; -moz-appearance:none;
+      background:var(--panel-2); border:1px solid rgba(148,163,184,.18); color:var(--text);
+      border-radius:999px; padding:9px 12px; min-width:220px; outline:none; max-width:100%;
+    }
+    .jump-select:focus{border-color:var(--focus); box-shadow:0 0 0 3px rgba(245,158,11,.25)}
+    .progress{height:6px; background:rgba(148,163,184,.2); border-radius:999px; overflow:hidden; margin-top:10px}
+    .progress > span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand), var(--ok)); transition:width .25s ease}/* Sidebar */
+aside.nav{
+  position:sticky; top:12px; align-self:start; background:var(--panel); border:1px solid rgba(148,163,184,.15);
+  border-radius: var(--radius); box-shadow: var(--shadow); padding:14px 10px; height:max-content; max-width:100%;
+}
+.nav h2{font-size:1rem; margin:4px 8px 8px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em}
+.nav ul{list-style:none; margin:0; padding:0; max-height:60vh; overflow:auto; scrollbar-width:thin}
+.nav li{margin:0}
+.nav a{
+  display:block; padding:8px 10px; border-radius:8px; color:var(--text);
+}
+.nav a:hover{background:rgba(148,163,184,.1); text-decoration:none}
+.nav a.active{background:linear-gradient(90deg, rgba(34,211,238,.2), rgba(96,165,250,.2)); border-left:3px solid var(--brand)}
+.nav ul ul{padding-left:14px; margin:6px 0}
+
+/* Main content */
+main{display:flex; flex-direction:column; gap:16px; min-width:0}
+section.card{
+  background:var(--panel); border:1px solid rgba(148,163,184,.15);
+  border-radius: var(--radius); box-shadow: var(--shadow); padding:18px; min-width:0;
+}
+section.card h2{
+  margin:0 0 10px; font-size:1.25rem; display:flex; align-items:center; gap:10px;
+  border-bottom:1px dashed rgba(148,163,184,.15); padding-bottom:8px; min-width:0;
+}
+h3{margin:.6rem 0 .4rem}
+h4{margin:.5rem 0 .35rem}
+.pill{font-size:.8rem; color:var(--muted); background:rgba(148,163,184,.12); padding:4px 8px; border-radius:999px}
+.k{font-family:var(--mono); font-size:.9rem; background:rgba(148,163,184,.12); padding:.15rem .4rem; border-radius:6px}
+p{margin:.4rem 0 .75rem; line-height:1.6}
+ul,ol{margin:.35rem 0 .75rem .95rem}
+li{margin:.2rem 0}
+.grid-2{display:grid; gap:14px; grid-template-columns: repeat(2, minmax(0,1fr))}
+.grid-3{display:grid; gap:14px; grid-template-columns: repeat(3, minmax(0,1fr))}
+@media (max-width: 980px){
+  .app{grid-template-columns: 1fr}
+  aside.nav{position:static; order:2}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+}
+.kbd{font-family:var(--mono); font-size:.85rem; background:rgba(148,163,184,.16); padding:.15rem .35rem; border-radius:6px; border:1px solid rgba(148,163,184,.2)}
+.checklist{display:grid; gap:8px}
+.check{display:flex; align-items:flex-start; gap:8px}
+.check input{margin-top:4px}
+code, pre{font-family: var(--mono)}
+pre{
+  background:var(--code-bg); color:#e8edf3; padding:12px 12px 12px 14px; border-radius:var(--radius-sm);
+  border:1px solid var(--code-border); position:relative; overflow:auto; scrollbar-width:thin; line-height:1.45;
+  white-space: pre-wrap; word-break: break-word;
+}
+.copy-btn{
+  position:absolute; top:8px; right:8px; background:#0ea5e9; border:none; color:white; font-size:.8rem;
+  border-radius:8px; padding:6px 8px; cursor:pointer; opacity:.9;
+}
+.copy-btn:hover{opacity:1}
+.muted{color:var(--muted)}
+.tag-row{display:flex; flex-wrap:wrap; gap:8px; margin:.25rem 0}
+.tag{font-size:.8rem; background:rgba(148,163,184,.12); padding:.2rem .5rem; border-radius:999px; border:1px solid rgba(148,163,184,.18)}
+.callout{border-left:4px solid var(--brand); background:rgba(34,211,238,.08); padding:10px 12px; border-radius:8px; margin:.5rem 0}
+.warn{border-left-color:var(--warn); background:rgba(245,158,11,.10)}
+.ok{border-left-color:var(--ok); background:rgba(16,185,129,.10)}
+footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; text-align:center;}
+.small{font-size:.92rem}
+.inline-list{display:flex; flex-wrap:wrap; gap:10px}
+.divider{height:1px; background:rgba(148,163,184,.15); margin:10px 0}
+.hide{display:none !important}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="hero" role="banner">
+      <div class="hero-inner">
+        <div class="brand-row">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>KCNA Learning — Cloud Native & Kubernetes</h1>
+            <div class="subtitle">A sleek, fast, single-page reference for the Kubernetes and Cloud Native Associate (KCNA) exam and related fundamentals.</div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <input id="search" type="search" placeholder="Search topics, commands, acronyms…" aria-label="Search content" />
+          <label class="chip" for="jumpSelect">Jump:
+            <select id="jumpSelect" class="jump-select" aria-label="Jump to section">
+              <option value="" selected disabled>Jump to section…</option>
+            </select>
+          </label>
+          <span class="chip" title="Local progress is saved in your browser">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 12l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Progress: <strong id="progressText">0%</strong>
+          </span>
+          <span class="chip">Keyboard: <span class="kbd">/</span> search • <span class="kbd">g</span><span class="kbd">t</span> top</span>
+        </div>
+        <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+      </div>
+    </header><aside class="nav" role="navigation" aria-label="Section navigation">
+  <h2>Contents</h2>
+  <ul id="toc"></ul>
+</aside>
+
+<main id="content" role="main">
+  <!-- Cloud Native Basics -->
+  <section id="cloud-native-basics" class="card">
+    <h2>Cloud Native Basics</h2>
+    <p>Cloud native is a mindset and approach for building systems designed for the cloud (public, private, or hybrid). The Cloud Native Computing Foundation (CNCF), part of the Linux Foundation (est. 2000), was established in 2015. Kubernetes was the first donated project.</p>
+    <div class="callout ok"><strong>4Cs of Cloud Native Security:</strong> Cloud → Cluster → Container → Code</div>
+
+    <h3 id="governance">Cloud Native Governance</h3>
+    <ul>
+      <li><strong>TOC</strong> (Technical Oversight Committee): oversees project lifecycle (sandbox → incubating → graduated)</li>
+      <li><strong>TAG</strong> (Technical Advisory Group)</li>
+      <li><strong>SIG</strong> (Special Interest Group)</li>
+    </ul>
+
+    <h3 id="personas">Cloud Native Personas</h3>
+    <ul>
+      <li><strong>DevOps:</strong> bridges development and operations with automation</li>
+      <li><strong>SRE:</strong> uptime, reliability, error budgets, scalability</li>
+      <li><strong>DevSecOps:</strong> security integrated throughout the lifecycle</li>
+      <li><strong>CloudOps:</strong> operates public/private/hybrid cloud infrastructure</li>
+      <li><strong>Cloud Architect:</strong> designs apps/infra for performance, scalability, reliability, and cost</li>
+      <li><strong>FinOps:</strong> cost management, optimization, budgeting and forecasting</li>
+      <li><strong>ML Engineer / Data Scientist / Data Engineer</strong></li>
+    </ul>
+
+    <h3 id="serverless-overview">Serverless (overview)</h3>
+    <ul>
+      <li>FaaS on Kubernetes via <strong>Knative</strong> or <strong>OpenFaaS</strong></li>
+      <li><strong>CloudEvents</strong> spec for interoperable event payloads</li>
+      <li>Scale to zero; provisioned concurrency; cold-start considerations</li>
+      <li>Beware vendor lock-in; prefer open standards and declarative config</li>
+    </ul>
+
+    <h3 id="autoscaling-overview">Autoscaling</h3>
+    <ul>
+      <li><strong>HPA</strong> (Horizontal): scales replicas by metrics (CPU, custom)</li>
+      <li><strong>VPA</strong> (Vertical): adjusts requests/limits (bounded by node)</li>
+      <li><strong>Cluster Autoscaler</strong>: adds nodes when pods can’t be scheduled</li>
+      <li><strong>KEDA</strong>: event-driven autoscaling (supports scale to zero)</li>
+    </ul>
+  </section>
+
+  <!-- Cloud Native Architecture -->
+  <section id="cloud-native-architecture" class="card">
+    <h2>Cloud Native Architecture</h2>
+    <p><strong>Characteristics:</strong> resiliency, agility, operability, observability; high automation; self‑healing; scalable; cost‑efficient; maintainable; secure.</p>
+    <p><strong>Well‑Architected pillars:</strong> operational excellence; security/privacy/compliance; reliability; cost optimization; performance efficiency.</p>
+
+    <h3 id="serverless-architecture">Serverless Architecture</h3>
+    <ul>
+      <li>Event sources → Broker/Trigger → Functions/Services (Knative Serving/Eventing)</li>
+      <li>Ingress, autoscaling, and revisioning managed by the platform</li>
+      <li>Metrics and traces via OpenTelemetry; use CloudEvents for portability</li>
+    </ul>
+  </section>
+
+  <!-- CNCF Projects -->
+  <section id="cncf-projects" class="card">
+    <h2>CNCF Projects (selected)</h2>
+    <ul>
+      <li>etcd</li>
+      <li>CoreDNS</li>
+      <li>Prometheus</li>
+      <li>Helm</li>
+      <li>Istio</li>
+      <li>Falco (runtime security detection)</li>
+      <li>Kubescape (misconfiguration & vulnerability scanning)</li>
+      <li>Argo CD (GitOps)</li>
+      <li>OpenTelemetry / OpenTracing</li>
+      <li>CloudEvents</li>
+      <li>OpenID Connect (OIDC)</li>
+      <li>Open Policy Agent (OPA)</li>
+    </ul>
+  </section>
+
+  <!-- Docker History -->
+  <section id="docker-history" class="card">
+    <h2>Docker History & Predecessors</h2>
+    <ul>
+      <li>IBM mainframes (CP/CMS), chroot, FreeBSD jails, Solaris Zones, HP‑UX vPars</li>
+      <li>Linux namespaces (user, net, pid, mount, uts, ipc, cgroup, time) and cgroups</li>
+      <li>Docker: started as dotCloud (2010), renamed in 2013; containers share the host kernel</li>
+    </ul>
+  </section>
+
+  <!-- Docker Commands -->
+  <section id="docker-commands" class="card">
+    <h2>Docker Commands & Cheat Sheet</h2>
+    <pre><button class="copy-btn">Copy</button><code># Storage driver & layers
+docker info | grep -i "Storage Driver"
+docker inspect <image>
+docker manifest inspect <image:tag>
+docker save <image> -o /tmp/image.tarBuildx (multi-arch)docker buildx create --name buildx-multi-arch
+docker buildx use buildx-multi-arch
+docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t user/app:tag .Cleanupdocker system pruneRun and remove on exitdocker run -it --rm alpine:3.20 shPublish all mapped portsdocker run -P nginx:stable</code></pre>
+</section>  <!-- Kubernetes: Architecture & Topics -->
+  <section id="kubernetes" class="card">
+    <h2>Kubernetes: Architecture & Core Topics</h2>
+
+    <div class="grid-2">
+      <div>
+        <img src="k8s_architecture-1.gif" height="500px" align="center"></img>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h4 id="k8s-architecture">Control Plane</h4>
+        <ul>
+          <li>kube-apiserver (front door; often behind a load balancer)</li>
+          <li>kube-scheduler</li>
+          <li>kube-controller-manager (controller loops)</li>
+          <li>etcd (strongly consistent key‑value store; RAFT)</li>
+          <li>CoreDNS (standard Pod)</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Worker Node</h4>
+        <ul>
+          <li>kubelet (runs on workers and control plane)</li>
+          <li>Container runtime: containerd with runC/crun/Kata/gVisor</li>
+          <li>kube-proxy (DaemonSet on each node)</li>
+        </ul>
+      </div>
+    </div>
+    <h4>Networking paths</h4>
+    <ol>
+      <li>Container ↔ Container (in a Pod) via localhost</li>
+      <li>Pod ↔ Pod: via cluster networking (e.g., Services, headless Services)</li>
+      <li>Pod ↔ Service: kube-proxy and node packet filtering</li>
+      <li>External ↔ Service: kube-proxy and node packet filtering</li>
+    </ol>
+
+    <h3 id="kubectl-basics">kubectl Basics</h3>
+    <div class="grid-2">
+      <div>
+        <pre><button class="copy-btn">Copy</button><code>kubectl top
+kubectl api-resources | more
+kubectl get all -A
+kubectl port-forward pod/nginx 8080:80
+kubectl get pods,nodes,deployments,svc -o wide
+kubectl run --image ubuntu ubuntu -- sleep infinity
+kubectl delete pod/nginx --nowHelpkubectl explain pod.spec.restartPolicyCombine multiple files and applykubectl apply -f combined.ymlExec into a containerkubectl exec -it <pod> -c <container> -- <command></code></pre>
+</div>
+<div>
+<pre><button class="copy-btn">Copy</button><code># One-off curl pod
+kubectl run -it --rm curl --image=curlimages/curl --restart=Never -- http://<pod-ip>:80Port-forward via Servicekubectl port-forward service/nginx 8080:80Namespaceskubectl get ns
+kubectl create namespace my-namespace
+kubectl config set-context --current --namespace=my-namespaceCreate and describe simple Podkubectl run nginx --image=nginx:1.19
+kubectl describe pod nginx</code></pre>
+</div>
+</div>    <h3 id="kubectl-cheatsheet">kubectl Cheat Sheet</h3>
+    <p class="muted small">Lines wrap on small screens to avoid horizontal scrolling.</p>
+    <h4>Contexts & Cluster Info</h4>
+    <pre><button class="copy-btn">Copy</button><code>kubectl config get-contexts
+kubectl config use-context <context>
+kubectl config set-context --current --namespace=<ns>
+kubectl config view --minify
+kubectl cluster-info
+kubectl version --short
+kubectl api-resources</code></pre>
+<h4>Get, Describe, Watch</h4>
+<pre><button class="copy-btn">Copy</button><code>kubectl get pods -A -o wide
+kubectl get deploy,rs,svc,ing -n <ns>
+kubectl describe pod <pod> -n <ns>
+kubectl get events --sort-by=.lastTimestamp
+kubectl get <kind> <name> -o yaml
+kubectl get pod <pod> -o jsonpath='{.spec.containers[*].image}'</code></pre>
+<h4>Create / Apply / Delete</h4>
+<pre><button class="copy-btn">Copy</button><code>kubectl create -f <file|dir>
+kubectl apply -f <file|dir>
+kubectl delete -f <file|dir>
+kubectl replace -f <file>
+kubectl diff -f <file|dir></code></pre>
+<h4>Logs, Exec, Port‑forward, Copy</h4>
+<pre><button class="copy-btn">Copy</button><code>kubectl logs <pod> -c <container> --tail=100 -f
+kubectl exec -it <pod> -c <container> -- sh
+kubectl port-forward svc/<service> 8080:80
+kubectl cp <ns>/<pod>:/path/in/pod ./local/dir</code></pre>
+<h4>Scale & Rollout</h4>
+<pre><button class="copy-btn">Copy</button><code>kubectl scale deploy/<name> --replicas=3
+kubectl set image deploy/<name> <container>=<image:tag>
+kubectl rollout status deploy/<name>
+kubectl rollout history deploy/<name>
+kubectl rollout undo deploy/<name> --to-revision=2</code></pre>
+<h4>Services & Networking</h4>
+<pre><button class="copy-btn">Copy</button><code>kubectl expose deploy/<name> --type=ClusterIP --port=80 --target-port=8080
+kubectl expose deploy/<name> --type=NodePort
+kubectl expose deploy/<name> --type=LoadBalancer --port 80 --target-port 8080
+kubectl get svc,ep -o wide -n <ns>
+kubectl run tmp --rm -it --image=busybox --restart=Never -- sh
+nslookup my-svc.my-ns.svc.cluster.local
+curl -s http://my-svc:80</code></pre>
+<h4>Namespaces & RBAC</h4>
+<pre><button class="copy-btn">Copy</button><code>kubectl create ns demo
+kubectl get role,rolebinding -n demo
+kubectl create role read-pods --verb=get,list,watch --resource=pods -n demo
+kubectl create rolebinding read-pods --role=read-pods --serviceaccount=demo:default -n demo
+kubectl auth can-i list pods --as system:serviceaccount:demo:default -n demo</code></pre>
+<h4>Scheduling & Nodes</h4>
+<pre><button class="copy-btn">Copy</button><code>kubectl cordon <node>
+kubectl drain <node> --ignore-daemonsets --delete-emptydir-data
+kubectl uncordon <node>
+kubectl taint nodes <node> key=value:NoSchedule
+kubectl label node <node> pool=blue --overwrite
+kubectl top nodes
+kubectl top pods -A</code></pre>
+<h4>Jobs & CronJobs</h4>
+<pre><button class="copy-btn">Copy</button><code>kubectl create job pi --image=perl -- perl -Mbignum=bpi -wle 'print bpi(1000)'
+kubectl create cronjob backup --image=alpine --schedule="0 2 * * *" -- sh -c 'echo backup'
+kubectl get jobs,cronjobs -A
+kubectl delete job/<name> cronjob/<name></code></pre>
+<h4>ConfigMaps & Secrets</h4>
+<pre><button class="copy-btn">Copy</button><code>kubectl create configmap app --from-literal=ENV=prod
+kubectl create secret generic db --from-literal=USER=admin --from-literal=PASS=secret
+kubectl get cm,secret -n <ns>
+kubectl describe secret db -n <ns></code></pre>
+<h4>Debug & Troubleshoot</h4>
+<pre><button class="copy-btn">Copy</button><code>kubectl describe pod <pod> -n <ns>
+kubectl get events -A --sort-by=.lastTimestamp | tailEphemeral container (if available)kubectl debug -it deploy/<name> --image=busybox --target=<container>
+kubectl debug node/<node> -it --image=busybox</code></pre>    <h3 id="cluster-setup">Cluster Setup</h3>
+    <ul>
+      <li><strong>kubeadm:</strong> production‑grade bootstrap</li>
+      <li><strong>kind:</strong> multi‑node clusters in Docker (local/dev)</li>
+      <li><strong>minikube / MicroK8s:</strong> local development</li>
+    </ul>
+
+    <h3 id="namespaces">Namespaces</h3>
+    <ul>
+      <li>ResourceQuotas, LimitRanges; access control via RBAC</li>
+      <li>Default: <span class="k">default</span>, <span class="k">kube-public</span>, <span class="k">kube-system</span>, <span class="k">kube-node-lease</span></li>
+    </ul>
+    <pre><button class="copy-btn">Copy</button><code>kubectl config view
+kubectl create namespace my-namespace
+kubectl config set-context --current --namespace=my-namespace</code></pre>    <h3 id="deployments">Deployments</h3>
+    <ul><li>Manage updates, replicas, and rollbacks</li></ul>
+    <pre><button class="copy-btn">Copy</button><code>kubectl create deployment nginx --image=nginx -o yaml | tee deployment.yaml | kubectl apply -f -
+kubectl get deployment -o wide
+kubectl rollout history deployment/nginx
+kubectl annotate deployment/nginx kubernetes.io/change-cause="initial version"
+kubectl apply -f deployment.yaml && kubectl rollout status deployment/nginx
+kubectl set image deployment/nginx nginx=nginx:stable && kubectl rollout status deployment/nginx
+kubectl describe deployment/nginx
+kubectl rollout undo deployment/nginx
+kubectl scale deployment/nginx --replicas=10</code></pre>    <h3 id="services">Services</h3>
+    <p>Types: ClusterIP, NodePort, LoadBalancer, ExternalName (plus headless Service with no cluster IP)</p>
+    <pre><button class="copy-btn">Copy</button><code># Expose a Deployment (dry-run)
+kubectl expose deployment/nginx --dry-run=client -o yaml
+kubectl get services
+kubectl get endpoints
+kubectl describe service/nginxPort-forward to a Servicekubectl port-forward service/nginx 8080:80DNS: <service>.<namespace>.svc.cluster.localkubectl expose deployment/nginx --type=NodePort
+kubectl expose deployment/nginx --type=LoadBalancer --port 8080 --target-port 80
+kubectl create service externalname my-service --external-name nginx.default.svc.cluster.local</code></pre>    <h3 id="jobs">Jobs & CronJobs</h3>
+    <ul>
+      <li>Manage and track tasks with retries on failure</li>
+      <li>Use CronJobs for backups and scheduled maintenance</li>
+    </ul>
+    <pre><button class="copy-btn">Copy</button><code>kubectl create job calculatepi --image=perl:5.34.0 -- perl -Mbignum=bpi -wle 'print bpi(2000)'
+kubectl get jobs
+kubectl create cronjob my-cron-job --image=<image> --schedule="*/5 * * * *" -- <cmd>Limit history in spec.spec.successfulJobsHistoryLimit</code></pre>    <h3 id="configmaps">ConfigMaps</h3>
+    <p>Decouple configuration from Pods. Use as environment variables or mount as files.</p>
+    <pre><button class="copy-btn">Copy</button><code>kubectl create configmap my-config --from-literal=key1=value1 --from-literal=key2=value2
+kubectl create configmap my-config --from-env-file=.env</code></pre>    <h3 id="secrets">Secrets</h3>
+    <p>Store credentials and sensitive data. Base64 encodes values; use external KMS for strong encryption.</p>
+    <pre><button class="copy-btn">Copy</button><code>kubectl create secret generic my-secret --from-literal=colour=red</code></pre>
+
+    <h3 id="labels">Labels & Selectors</h3>
+    <ul><li>Metadata for resources; used by Services, NetworkPolicies, rollouts, monitoring, and cost tools</li></ul>
+    <pre><button class="copy-btn">Copy</button><code>kubectl get all --selector=&lt;label&gt;=&lt;value&gt;</code></pre>
+
+    <h3 id="kube-networking">Kubernetes Networking</h3>
+    <p><strong>Service:</strong> a logical set of Pods with a policy to access them.</p>
+    <ul>
+      <li><strong>ClusterIP:</strong> internal stable IP (default)</li>
+      <li><strong>NodePort:</strong> exposes on each node’s port (typically 30000–32767)</li>
+      <li><strong>LoadBalancer:</strong> provisions an external LB (cloud provider)</li>
+      <li><strong>Headless:</strong> no cluster IP; direct endpoints via DNS</li>
+    </ul>
+
+    <h3 id="api-server">API Server</h3>
+    <p>Flow: <span class="pill">Authentication</span> → <span class="pill">Authorization</span> → <span class="pill">Admission Control</span> → Validation → Request handling → Response</p>
+    <ul>
+      <li>Sources: internal components, kubectl, third‑party services (default port 6443)</li>
+      <li><strong>Authentication:</strong> tokens, client certificates, OIDC</li>
+      <li><strong>Authorization modes:</strong> Node, ABAC, RBAC, Webhook</li>
+      <li><strong>Admission controllers:</strong> mutate/validate requests; enforce policies and quotas; namespace management; CRDs extend the API</li>
+    </ul>
+    <pre><button class="copy-btn">Copy</button><code>kubectl get nodes -v=6
+kubectl proxy &  # local proxy for unauthenticated curl
+curl http://127.0.0.1:&lt;port&gt;/openapi/v3</code></pre>    <h3 id="rbac">RBAC & Access Control</h3>
+    <ul>
+      <li>Users/groups managed externally; ServiceAccounts are namespaced</li>
+      <li>Kubeconfig stores cluster/server and client credentials</li>
+      <li>ClusterRole/ClusterRoleBinding (cluster‑wide); Role/RoleBinding (namespaced)</li>
+    </ul>
+    <pre><button class="copy-btn">Copy</button><code>~/.kube/config
+KUBECONFIG=<file> kubectl config view --raw
+kubectl get clusterrolebindings
+kubectl describe clusterrole/cluster-admin
+kubectl create clusterrole cluster-superhero --verb='' --resource=''
+kubectl create clusterrolebinding cluster-superhero --cluster-role=cluster-superhero --group=cluster-superheroes
+kubectl auth can-i '' ''
+kubectl auth can-i '' '' --as-group=cluster-superheroes --as="superman"</code></pre>    <h3 id="scheduler">Scheduler & Placement</h3>
+    <ul>
+      <li>Phases: filter nodes → score nodes → bind Pod</li>
+      <li><span class="k">schedulerName</span> for custom schedulers</li>
+      <li><span class="k">nodeName</span> overrides scheduling if resources fit</li>
+      <li><span class="k">nodeSelector</span>, affinity/anti‑affinity</li>
+    </ul>
+
+    <!-- NEW: Kubernetes Storage -->
+    <h3 id="k8s-storage">Kubernetes Storage</h3>
+
+    <h4>Ephemeral Storage</h4>
+    <ul>
+      <li><strong>emptyDir:</strong> a per‑Pod scratch space created when a Pod starts; deleted when the Pod is removed. Stored on the node’s filesystem by default.</li>
+      <li><strong>Memory‑backed emptyDir:</strong> set <span class="k">emptyDir.medium: Memory</span> to use tmpfs (RAM); useful for fast scratch or to avoid disk I/O.</li>
+      <li><strong>Container restarts:</strong> emptyDir content persists across container restarts within the same Pod.</li>
+      <li><strong>Ephemeral storage limits:</strong> control with resource <span class="k">ephemeral-storage</span> requests/limits.</li>
+    </ul>
+<h4>Persistent Storage (PV, PVC, StorageClass)</h4>
+<ul>
+  <li><strong>Flow:</strong> Pod → references a <strong>PVC</strong> → PVC matches/binds a <strong>PV</strong> (statically created) or triggers dynamic provisioning via a <strong>StorageClass</strong>.</li>
+  <li><strong>AccessModes:</strong> <span class="k">ReadWriteOnce</span> (or <span class="k">ReadWriteOncePod</span>), <span class="k">ReadOnlyMany</span>, <span class="k">ReadWriteMany</span> (availability depends on the driver).</li>
+  <li><strong>Reclaim policy:</strong> set on the PV (and copied from the StorageClass during dynamic provisioning). Common values:
+    <ul>
+      <li><span class="k">Delete</span>: deletes the underlying storage when the PVC is deleted (typical default for dynamically provisioned volumes).</li>
+      <li><span class="k">Retain</span>: retains the storage resource for manual recovery or reuse (common for statically created PVs).</li>
+    </ul>
+  </li>
+  <li><strong>VolumeBindingMode (StorageClass):</strong> <span class="k">Immediate</span> or <span class="k">WaitForFirstConsumer</span> (delays provisioning until the Pod is scheduled to choose topology‑correct storage).</li>
+</ul>
+
+<h4>Provisioners & Solutions</h4>
+<ul>
+  <li><strong>CSI drivers:</strong> cloud and on‑prem (e.g., AWS EBS, GCE PD, Azure Disk, Ceph RBD/CephFS, NFS, etc.).</li>
+  <li><strong>Rook:</strong> CNCF graduated operator to deploy and manage storage backends (notably <strong>Ceph</strong>) on Kubernetes.</li>
+  <li><strong>Ceph:</strong> unified object (RGW/S3), block (RBD), and file (CephFS) storage; widely used with Rook. Red Hat OpenShift’s data platform (OpenShift Data Foundation, formerly OCS) is based on Ceph.</li>
+  <li><strong>Static vs dynamic:</strong> you can create PVs manually (static) or let the StorageClass dynamically provision PVs when a PVC is created.</li>
+</ul>
+
+<h3 id="storage">Storage & Stateful</h3>
+<ul>
+  <li>CSI drivers: Amazon EBS, GCE PD, Azure Disk, Ceph, GlusterFS, NFS, etc.</li>
+  <li>PersistentVolumes (PV) and PersistentVolumeClaims (PVC)</li>
+  <li>Rook (CNCF) for storage orchestration</li>
+</ul>
+
+<h3 id="network-policy">Network Policies</h3>
+<ul>
+  <li>Isolate Pods by IP/namespace selectors; <strong>ingress</strong> and <strong>egress</strong>; policies are cumulative</li>
+  <li>Requires a CNI plugin that enforces policies (e.g., Calico, Cilium, Weave)</li>
+</ul>
+
+<h3 id="security">Security</h3>
+<ul>
+  <li>Harden base images; secure CI/CD; AppArmor/SELinux</li>
+  <li>Admission control (PSP removed in 1.25 → use Kyverno or OPA Gatekeeper)</li>
+  <li>Falco (runtime detection); OIDC; Kubescape (misconfiguration & vulnerability scanning)</li>
+</ul>
+<pre><button class="copy-btn">Copy</button><code># SecurityContext example
+
+
+spec:
+securityContext:
+runAsUser: 1000
+runAsGroup: 1000
+containers:
+
+name: app
+image: example
+securityContext:
+allowPrivilegeEscalation: false</code></pre>
+<h3 id="pdb">Pod Disruption Budgets (PDB) & Maintenance</h3>
+<ol>
+  <li>Cordon node → drain → workloads move → uncordon</li>
+</ol>
+<pre><button class="copy-btn">Copy</button><code>kubectl cordon &lt;node&gt;
+
+
+kubectl drain <node> --ignore-daemonsets --delete-emptydir-data
+kubectl uncordon <node>
+kubectl create pdb nginx --selector=app=nginx --min-available=2</code></pre>    <h3 id="scheduling-objects">Scheduling: Selectors, Affinity, Taints</h3>
+    <ul>
+      <li><strong>nodeSelector</strong> matches node labels</li>
+      <li><strong>Affinity/anti‑affinity</strong> (preferred or required)</li>
+      <li><strong>Topology spread constraints</strong> distribute Pods across zones/regions</li>
+      <li><strong>Taints & Tolerations</strong> (NoSchedule, PreferNoSchedule, NoExecute)</li>
+    </ul>
+    <pre><button class="copy-btn">Copy</button><code>kubectl taint node worker region=useast2:NoSchedule</code></pre>
+
+    <h3 id="workloads">Workloads & Pod Lifecycle</h3>
+    <ul>
+      <li>ReplicaSet, Deployment (stateless), StatefulSet, DaemonSet, Job, CronJob</li>
+      <li>Pod lifecycle: Pending → Running → Succeeded/Failed → Unknown</li>
+      <li>Init containers for ordered startup</li>
+      <li>Container spec: name, image, command, ports, resources, liveness/readiness probes, securityContext</li>
+    </ul>
+
+    <!-- NEW: StatefulSet details -->
+    <h4 id="statefulset-highlights">StatefulSet highlights</h4>
+    <ul>
+      <li><strong>Stable network identity:</strong> ordered Pod names (e.g., <span class="k">web-0</span>, <span class="k">web-1</span>).</li>
+      <li><strong>Stable persistent storage:</strong> per‑Pod PVCs via <span class="k">volumeClaimTemplates</span>.</li>
+      <li><strong>Ordered, graceful deployment/scaling:</strong> create/terminate Pods sequentially.</li>
+      <li><strong>Ordered rolling updates:</strong> supports partitioned rolling updates for controlled upgrades.</li>
+    </ul>
+    <pre><button class="copy-btn">Copy</button><code>apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+name: web
+spec:
+serviceName: web
+replicas: 3
+selector:
+matchLabels: { app: web }
+updateStrategy:
+type: RollingUpdate
+template:
+metadata: { labels: { app: web } }
+spec:
+containers:
+- name: app
+image: nginx:stable
+ports: [{ name: http, containerPort: 80 }]
+volumeMounts:
+- name: data
+mountPath: /var/www
+volumeClaimTemplates:
+
+metadata:
+name: data
+spec:
+accessModes: ["ReadWriteOnce"]
+storageClassName: fast
+resources:
+requests:
+storage: 5Gi
+</code></pre>
+  </section>
+  <!-- Helm -->
+  <section id="helm" class="card">
+    <h2>Helm Charts</h2>
+    <ul>
+      <li>Package manager for Kubernetes apps</li>
+      <li>Chart.yaml (name/type/version/description), values.yaml (image, registry, configuration)</li>
+    </ul>
+    <pre><button class="copy-btn">Copy</button><code>helm create myapp
+
+helm install myapp .
+helm package .
+helm install myapp ./myapp-0.1.0.tgz
+helm uninstall myapp</code></pre>
+</section>  <!-- Service Mesh -->
+  <section id="service-mesh" class="card">
+    <h2>Service Mesh</h2>
+    <ul>
+      <li>Enhances security, observability, and reliability; data plane + control plane</li>
+      <li>Sidecar pattern; mTLS; access control; circuit breaking; monitoring</li>
+      <li>Istio, Linkerd; SMI (Service Mesh Interface)</li>
+    </ul>
+  </section>
+
+  <!-- Observability -->
+  <section id="observability" class="card">
+    <h2>Observability: Metrics, Logs, Traces</h2>
+    <ul>
+      <li><strong>Metrics:</strong> kube-state-metrics; node-exporter; Prometheus Adapter</li>
+      <li><strong>Logging:</strong> node-level collection; sidecars; application-level; tools: fluentd, Filebeat; backends: OpenSearch, Grafana Loki</li>
+      <li><strong>Visualization/alerts:</strong> Grafana; Alertmanager</li>
+      <li><strong>Tracing:</strong> Jaeger; OpenTelemetry</li>
+    </ul>
+    <div class="grid-2">
+      <div>
+        <pre><button class="copy-btn">Copy</button><code># Logs
+docker logs nginx
+kubectl logs nginx
+kubectl logs -p -c ruby web-1
+kubectl logs -f -c ruby web-1
+kubectl logs --tail=20 nginx
+kubectl logs --since=1h nginx</code></pre>
+</div>
+<div>
+<div class="tag-row">
+<span class="tag">Thanos (Prometheus at scale)</span>
+<span class="tag">Cortex</span>
+<span class="tag">OpenTelemetry</span>
+</div>
+</div>
+</div>
+</section>  <!-- Cloud Native Application Delivery -->
+  <section id="app-delivery" class="card">
+    <h2>Cloud Native Application Delivery</h2>
+    <ul>
+      <li><strong>CI/CD concepts:</strong> build pipelines, automated tests, artifact repositories, progressive delivery (blue/green, canary)</li>
+      <li><strong>GitOps principles:</strong> declarative manifests; desired state in Git; pull‑based reconciler (e.g., Argo CD)</li>
+      <li><strong>Best practices:</strong> immutable images; image signing; policy checks (OPA/Kyverno); environment overlays (Kustomize/Helm)</li>
+    </ul>
+    <pre><button class="copy-btn">Copy</button><code># Example: render and apply with Helm (CI step)
+helm template myapp ./chart | kubeval -Example: Argo CD app (declarative)apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+name: myapp
+spec:
+project: default
+source:
+repoURL: https://github.com/acme/myapp
+path: deploy/overlays/prod
+targetRevision: main
+destination:
+server: https://kubernetes.default.svc
+namespace: myapp
+syncPolicy:
+automated:
+prune: true
+selfHeal: true</code></pre>
+</section>  <!-- Resources -->
+  <section id="resources" class="card">
+    <h2>Resources & Pointers</h2>
+    <ul>
+      <li><a href="https://github.com/walidshaari/Kubernetes-and-Cloud-Native-Associate" target="_blank" rel="noopener">Kubernetes and Cloud Native Associate</a></li>
+      <li><a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/architecture/" target="_blank" rel="noopener">GitOps with Argo CD</a></li>
+      <li><a href="https://sysdig.com/learn-cloud-native/dockerfile-best-practices/" target="_blank" rel="noopener">Dockerfile best practices (Sysdig)</a></li>
+      <li><a href="https://labs.play-with-k8s.com/" target="_blank" rel="noopener">Play with Kubernetes</a></li>
+      <li><a href="https://kubernetes.io/docs/reference/kubectl/overview/" target="_blank" rel="noopener">kubectl overview</a></li>
+      <li><a href="https://github.com/cncf/curriculum/tree/master/kcna" target="_blank" rel="noopener">CNCF KCNA curriculum</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  Built for speed: single file, zero external deps. Local progress is saved in your browser.
+</footer>
+  </div>  <script>
+    // Accessibility: focus search with '/'
+    const search = document.getElementById('search');
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement !== search) {
+        e.preventDefault();
+        search.focus();
+      }
+      if (e.key.toLowerCase() === 'g') {
+        window.__gKey = Date.now();
+      } else if (e.key.toLowerCase() === 't' && window.__gKey && Date.now() - window.__gKey < 600) {
+        window.scrollTo({top:0, behavior:'smooth'});
+      }
+    });
+
+    const toc = document.getElementById('toc');
+    const jumpSelect = document.getElementById('jumpSelect');
+    const sections = Array.from(document.querySelectorAll('main > section.card'));
+
+    // Build Table of Contents (sidebar) with submenu for H3 headings
+    sections.forEach((sec) => {
+      const title = sec.querySelector('h2')?.textContent?.trim() || sec.id;
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = '#' + sec.id;
+      a.textContent = title;
+      li.appendChild(a);
+
+      // Build submenu for H3
+      const h3s = Array.from(sec.querySelectorAll('h3[id]'));
+      if (h3s.length) {
+        const ul = document.createElement('ul');
+        h3s.forEach(h => {
+          const sli = document.createElement('li');
+          const sa = document.createElement('a');
+          sa.href = '#' + h.id;
+          sa.textContent = h.textContent.trim();
+          sli.appendChild(sa);
+          ul.appendChild(sli);
+        });
+        li.appendChild(ul);
+      }
+
+      toc.appendChild(li);
+    });
+
+    // Build Jump select (top-level sections)
+    let n = 1;
+    sections.forEach((sec) => {
+      const title = sec.querySelector('h2')?.textContent?.trim() || sec.id;
+      const opt = document.createElement('option');
+      opt.value = sec.id;
+      opt.textContent = `${String(n).padStart(2,'0')} — ${title}`;
+      jumpSelect.appendChild(opt);
+      n++;
+    });
+
+    // Jump select behavior
+    jumpSelect.addEventListener('change', () => {
+      const id = jumpSelect.value;
+      if (!id) return;
+      const el = document.getElementById(id);
+      el?.scrollIntoView({behavior:'smooth', block:'start'});
+      setTimeout(() => { jumpSelect.selectedIndex = 0; }, 400);
+    });
+
+    // Active link highlighting on scroll for sidebar
+    const observer = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        const id = entry.target.id;
+        const link = toc.querySelector('a[href="#'+id+'"]');
+        if (entry.isIntersecting) {
+          toc.querySelectorAll('a').forEach(a=>a.classList.remove('active'));
+          link?.classList.add('active');
+        }
+      });
+    }, {rootMargin: '-40% 0px -55% 0px', threshold: 0});
+    sections.forEach(s=>observer.observe(s));
+
+    // Client-side search (filter sections)
+    const norm = s => s.toLowerCase().replace(/\s+/g,' ');
+    search.addEventListener('input', ()=>{
+      const q = norm(search.value);
+      sections.forEach(sec=>{
+        const text = norm(sec.textContent || '');
+        sec.classList.toggle('hide', q && !text.includes(q));
+      });
+    });
+
+    // Copy buttons (copy only the code inside <code>)
+    document.querySelectorAll('pre').forEach(pre=>{
+      const btn = pre.querySelector('.copy-btn');
+      const codeEl = pre.querySelector('code');
+      if (!btn || !codeEl) return;
+      btn.addEventListener('click', async ()=>{
+        const code = codeEl.innerText;
+        try{
+          await navigator.clipboard.writeText(code);
+          const prev = btn.textContent;
+          btn.textContent = 'Copied';
+          btn.style.background = '#10b981';
+          setTimeout(()=>{btn.textContent = prev; btn.style.background = '#0ea5e9';}, 1200);
+        }catch(e){
+          btn.textContent = 'Press Ctrl+C';
+        }
+      });
+    });
+
+    // Checklists persistence + progress
+    const checks = Array.from(document.querySelectorAll('input[type="checkbox"][data-id]'));
+    const key = 'kcna-progress-v6';
+    const saved = JSON.parse(localStorage.getItem(key) || '{}');
+    checks.forEach(c=>{
+      if (saved[c.dataset.id] !== undefined) c.checked = !!saved[c.dataset.id];
+      c.addEventListener('change', ()=>{
+        saved[c.dataset.id] = c.checked;
+        localStorage.setItem(key, JSON.stringify(saved));
+        updateProgress();
+      });
+    });
+    function updateProgress(){
+      const total = checks.length;
+      const done = checks.filter(c=>c.checked).length;
+      const pct = total ? Math.round((done/total)*100) : 0;
+      document.getElementById('progressText').textContent = pct + '%';
+      document.getElementById('progressBar').style.width = pct + '%';
+    }
+    updateProgress();
+
+    // Respect reduced motion
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.style.scrollBehavior = 'auto';
+    }
+  </script></body>
+</html>
