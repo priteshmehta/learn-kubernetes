@@ -162,21 +162,11 @@ footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; t
           <div class="logo" aria-hidden="true"></div>
           <div>
             <h1>KCNA Learning — Cloud Native & Kubernetes</h1>
-            <div class="subtitle">A sleek, fast, single-page reference for the Kubernetes and Cloud Native Associate (KCNA) exam and related fundamentals.</div>
+            <div class="subtitle">Learn Kubernetes Fundametals and <a href="https://github.com/cncf/curriculum/tree/master/kcna", target="_blank">Cloud Native Associate (KCNA) Exam Preparation</a></div>
           </div>
         </div>
         <div class="toolbar">
           <input id="search" type="search" placeholder="Search topics, commands, acronyms…" aria-label="Search content" />
-          <label class="chip" for="jumpSelect">Jump:
-            <select id="jumpSelect" class="jump-select" aria-label="Jump to section">
-              <option value="" selected disabled>Jump to section…</option>
-            </select>
-          </label>
-          <span class="chip" title="Local progress is saved in your browser">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 12l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Progress: <strong id="progressText">0%</strong>
-          </span>
-          <span class="chip">Keyboard: <span class="kbd">/</span> search • <span class="kbd">g</span><span class="kbd">t</span> top</span>
         </div>
         <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
       </div>
@@ -189,7 +179,7 @@ footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; t
   <!-- Cloud Native Basics -->
   <section id="cloud-native-basics" class="card">
     <h2>Cloud Native Basics</h2>
-    <p>Cloud native is a mindset and approach for building systems designed for the cloud (public, private, or hybrid). The Cloud Native Computing Foundation (CNCF), part of the Linux Foundation (est. 2000), was established in 2015. Kubernetes was the first donated project.</p>
+    <p>Cloud native is a mindset and approach for building systems designed for the cloud (public, private, or hybrid). The Cloud Native Computing Foundation (CNCF) is established in 2015. It's a part of the Linux Foundation (est. 2000). Kubernetes was the first donated project.</p>
     <div class="callout ok"><strong>4Cs of Cloud Native Security:</strong> Cloud → Cluster → Container → Code</div>
 
     <h3 id="governance">Cloud Native Governance</h3>
@@ -210,20 +200,12 @@ footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; t
       <li><strong>ML Engineer / Data Scientist / Data Engineer</strong></li>
     </ul>
 
-    <h3 id="serverless-overview">Serverless (overview)</h3>
-    <ul>
-      <li>FaaS on Kubernetes via <strong>Knative</strong> or <strong>OpenFaaS</strong></li>
-      <li><strong>CloudEvents</strong> spec for interoperable event payloads</li>
-      <li>Scale to zero; provisioned concurrency; cold-start considerations</li>
-      <li>Beware vendor lock-in; prefer open standards and declarative config</li>
-    </ul>
-
     <h3 id="autoscaling-overview">Autoscaling</h3>
     <ul>
       <li><strong>HPA</strong> (Horizontal): scales replicas by metrics (CPU, custom)</li>
       <li><strong>VPA</strong> (Vertical): adjusts requests/limits (bounded by node)</li>
       <li><strong>Cluster Autoscaler</strong>: adds nodes when pods can’t be scheduled</li>
-      <li><strong>KEDA</strong>: event-driven autoscaling (supports scale to zero)</li>
+      <li><strong>KEDA</strong>: event-driven autoscaling (supports scale to zero)</li>       
     </ul>
   </section>
 
@@ -231,32 +213,43 @@ footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; t
   <section id="cloud-native-architecture" class="card">
     <h2>Cloud Native Architecture</h2>
     <p><strong>Characteristics:</strong> resiliency, agility, operability, observability; high automation; self‑healing; scalable; cost‑efficient; maintainable; secure.</p>
+    <p>Cloud environment is zero trust model. i.e all components’ indentity and integrity must be verified</p>
+    <p>Minimum set of permissions to control the demage in the case of compromised/security breach</p>
     <p><strong>Well‑Architected pillars:</strong> operational excellence; security/privacy/compliance; reliability; cost optimization; performance efficiency.</p>
 
     <h3 id="serverless-architecture">Serverless Architecture</h3>
     <ul>
+      <li><strong>CloudEvents</strong> spec for interoperable event payloads</li>
+      <li>Scale to zero; provisioned concurrency; cold-start considerations</li>
+      <li>Beware vendor lock-in; prefer open standards and declarative config</li>
       <li>Event sources → Broker/Trigger → Functions/Services (Knative Serving/Eventing)</li>
       <li>Ingress, autoscaling, and revisioning managed by the platform</li>
       <li>Metrics and traces via OpenTelemetry; use CloudEvents for portability</li>
+      <li><strong>Knative</strong>: A framework that enables Serverless functionality on top of kubenetes. Kanative provide platform to building/managing serverless apps 
+      <li><strong>openFaaS</strong>: It allows function to be deployed as service</li>
     </ul>
   </section>
 
   <!-- CNCF Projects -->
   <section id="cncf-projects" class="card">
-    <h2>CNCF Projects (selected)</h2>
+    <h2><a href="https://landscape.cncf.io",target="_blank">CNCF Projects</a></h2>
     <ul>
-      <li>etcd</li>
-      <li>CoreDNS</li>
-      <li>Prometheus</li>
-      <li>Helm</li>
-      <li>Istio</li>
-      <li>Falco (runtime security detection)</li>
+      <li>etcd (Disributed storage)</li>
+      <li>CoreDNS (DNS plug-in)</li>
+      <li>CRI-O (default container runtime in k8s)</li>
+      <li>Prometheus (Monitoring)</li>
+      <li>Helm (Managing/installing k8s applications)</li>
+      <li>Istio (Feature-rich but complex Service Mash)</li>
+      <li>LinkerD(simple & powerful tool to add security/observability/reliability to k8s)</li>
+      <li>Falco (Runtime security detection in kubecluster)</li>
       <li>Kubescape (misconfiguration & vulnerability scanning)</li>
-      <li>Argo CD (GitOps)</li>
+      <li>Argo CD (GitOps for App delivery)</li>
       <li>OpenTelemetry / OpenTracing</li>
       <li>CloudEvents</li>
-      <li>OpenID Connect (OIDC)</li>
-      <li>Open Policy Agent (OPA)</li>
+      <li>OpenID Connect (OIDC) (largescale k8s user Authentication)</li>
+      <li>Open Policy Agent (OPA) (Admission Controller)</li>
+      <li>kube-cost(Managing k8s cost)</li> 
+      <li>Cilium(eBPF-based Networking & security for k8s)</li>
     </ul>
   </section>
 
@@ -267,19 +260,26 @@ footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; t
       <li>IBM mainframes (CP/CMS), chroot, FreeBSD jails, Solaris Zones, HP‑UX vPars</li>
       <li>Linux namespaces (user, net, pid, mount, uts, ipc, cgroup, time) and cgroups</li>
       <li>Docker: started as dotCloud (2010), renamed in 2013; containers share the host kernel</li>
+      <li>runC is donated by Docker, it's a part of Open Conainer Initiative (OCI)</li>
+      <li>Union File System (AUFS) - Combines Multiple layers and make docker image with thin writable layer on the top</li>
     </ul>
   </section>
 
   <!-- Docker Commands -->
   <section id="docker-commands" class="card">
     <h2>Docker Commands & Cheat Sheet</h2>
-    <pre><button class="copy-btn">Copy</button><code># Storage driver & layers
-docker info | grep -i "Storage Driver"
-docker inspect <image>
-docker manifest inspect <image:tag>
-docker save <image> -o /tmp/image.tarBuildx (multi-arch)docker buildx create --name buildx-multi-arch
+    <pre><button class="copy-btn">Copy</button><code>
+docker version
+docker run nginx
+docker run -it --rm -P alpine:3.20 sh # Publish all mapped ports
+docker inspect {image_name}
+docker manifest inspect {image:tag}
+docker save {image} -o /tmp/image.tarBuildx (multi-arch)docker buildx create --name buildx-multi-arch
 docker buildx use buildx-multi-arch
-docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t user/app:tag .Cleanupdocker system pruneRun and remove on exitdocker run -it --rm alpine:3.20 shPublish all mapped portsdocker run -P nginx:stable</code></pre>
+docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t user/app:tag 
+docker info | grep -i "Storage Driver"
+docker system prune  #Remove all unused containers, networks, images
+</code></pre>
 </section>  <!-- Kubernetes: Architecture & Topics -->
   <section id="kubernetes" class="card">
     <h2>Kubernetes: Architecture & Core Topics</h2>
@@ -289,90 +289,119 @@ docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t user/app:ta
         <img src="k8s_architecture-1.gif" height="500px" align="center"></img>
       </div>
     </div>
-    <div class="grid-2">
+    <div class="grid-1">
       <div>
         <h4 id="k8s-architecture">Control Plane</h4>
         <ul>
-          <li>kube-apiserver (front door; often behind a load balancer)</li>
-          <li>kube-scheduler</li>
-          <li>kube-controller-manager (controller loops)</li>
-          <li>etcd (strongly consistent key‑value store; RAFT)</li>
-          <li>CoreDNS (standard Pod)</li>
+          <li>kube-Apiserver (front door; often behind a load balancer)</li>
+          <li>kube-Scheduler</li>
+          <li>kube-Controller-manager (controller loops)</li>
+          <li>etcd (strongly consistent distributed key‑value store; RAFT)</li>
+          <li>CoreDNS</li>
+          <li>Production cluster can have as little as 5 nodes or as many as 15000 nodes</li>
+          <li>Kube cluster nodes would be in auto-scaling group so nodes can be scalled up/down based on resource utlilization</li>
+          <li>Control plane nodes must be Linux</li>
         </ul>
       </div>
       <div>
         <h4>Worker Node</h4>
         <ul>
-          <li>kubelet (runs on workers and control plane)</li>
-          <li>Container runtime: containerd with runC/crun/Kata/gVisor</li>
-          <li>kube-proxy (DaemonSet on each node)</li>
+          <li>Kubelet is managing conainer lifecycle (runs on workers and control plane)</li>
+          <li>Container runtime: containerd with CRI-O/runC/crun/Kata/gVisor</li>
+          <li>Kube-Proxy runs DaemonSet on each node</li>
+          <li>Worker node can be linux or window</li>
+          <li>CNI - Container Networking Interface for overlay network</li>
         </ul>
       </div>
     </div>
+    <h4>Kubernetes Objects</h4>
+    <ol>
+      <li>Deployment -> Replicaset -> Pods for stateless apps (namespace level scoped)</li>
+        <ul>
+          <li>Pod lifecycle: Pending → Running → Succeeded/Failed → Unknown</li>
+          <li>Init containers for ordered startup</li>
+          <li>Container spec: name, image, command, ports, resources, liveness/readiness probes, securityContext</li>
+        </ul>
+      <li>StatefulSet - for persistent storage like Database/kafka apps (namespace level scoped)</li>
+          <ul>
+            <li><strong>Stable network identity:</strong> ordered Pod names (e.g., <span class="k">web-0</span>, <span class="k">web-1</span>).</li>
+            <li><strong>Stable persistent storage:</strong> per‑Pod PVCs via <span class="k">volumeClaimTemplates</span>.</li>
+            <li><strong>Ordered, graceful deployment/scaling:</strong> create/terminate Pods sequentially.</li>
+            <li><strong>Ordered rolling updates:</strong> supports partitioned rolling updates for controlled upgrades.</li>
+          </ul>
+      <li>DaemonSet - mostly running one pod per node (cluster level scoped)</li>
+      <li>Crobjob/Job - pod will be terminated after job finishes (can scheduled and control runing timeout, backoff etc..)</li>
+      <li>ConfigMap - A readonly settings as key/value for containers running in pod (namespace level scoped)</li>
+      <li>Secret - </li>
+      <li>Scheduling - </li>
+    </ol>
+
     <h4>Networking paths</h4>
     <ol>
       <li>Container ↔ Container (in a Pod) via localhost</li>
-      <li>Pod ↔ Pod: via cluster networking (e.g., Services, headless Services)</li>
+      <li>Pod ↔ Pod: via cluster networking (e.g., Services, headless services)</li>
       <li>Pod ↔ Service: kube-proxy and node packet filtering</li>
       <li>External ↔ Service: kube-proxy and node packet filtering</li>
     </ol>
 
     <h3 id="kubectl-basics">kubectl Basics</h3>
-    <div class="grid-2">
+    <div class="grid-1">
       <div>
         <pre><button class="copy-btn">Copy</button><code>kubectl top
 kubectl api-resources | more
 kubectl get all -A
-kubectl port-forward pod/nginx 8080:80
-kubectl get pods,nodes,deployments,svc -o wide
+kubectl top pods  
 kubectl run --image ubuntu ubuntu -- sleep infinity
-kubectl delete pod/nginx --nowHelpkubectl explain pod.spec.restartPolicyCombine multiple files and applykubectl apply -f combined.ymlExec into a containerkubectl exec -it <pod> -c <container> -- <command></code></pre>
+kubectl get deploy,rs,po -o wide --selector=role=app
+kubectl describe pod {pod} -n {ns}
+kubectl delete pod/nginx --now 
+kubectl explain pod.spec.restartPolicy # help
+kubectl apply -f combined.yml #combine multiple files
+kubectl exec -it {pod} -c {container} -- {command}  #Exec into a container
+</code></pre>
 </div>
-<div>
-<pre><button class="copy-btn">Copy</button><code># One-off curl pod
-kubectl run -it --rm curl --image=curlimages/curl --restart=Never -- http://<pod-ip>:80Port-forward via Servicekubectl port-forward service/nginx 8080:80Namespaceskubectl get ns
-kubectl create namespace my-namespace
-kubectl config set-context --current --namespace=my-namespaceCreate and describe simple Podkubectl run nginx --image=nginx:1.19
-kubectl describe pod nginx</code></pre>
 </div>
-</div>    <h3 id="kubectl-cheatsheet">kubectl Cheat Sheet</h3>
-    <p class="muted small">Lines wrap on small screens to avoid horizontal scrolling.</p>
+<h3 id="kubectl-cheatsheet">kubectl Cheat Sheet</h3>
     <h4>Contexts & Cluster Info</h4>
-    <pre><button class="copy-btn">Copy</button><code>kubectl config get-contexts
-kubectl config use-context <context>
-kubectl config set-context --current --namespace=<ns>
+    <pre><button class="copy-btn">Copy</button><code>
+kubectl config get-contexts
+kubectl config use-context {context}
+kubectl config set-context --current --namespace={ns}
 kubectl config view --minify
 kubectl cluster-info
 kubectl version --short
-kubectl api-resources</code></pre>
+</code></pre>
+
 <h4>Get, Describe, Watch</h4>
-<pre><button class="copy-btn">Copy</button><code>kubectl get pods -A -o wide
-kubectl get deploy,rs,svc,ing -n <ns>
-kubectl describe pod <pod> -n <ns>
+<pre><button class="copy-btn">Copy</button><code>
+kubectl get pods -A -o wide
+
 kubectl get events --sort-by=.lastTimestamp
 kubectl get <kind> <name> -o yaml
 kubectl get pod <pod> -o jsonpath='{.spec.containers[*].image}'</code></pre>
 <h4>Create / Apply / Delete</h4>
 <pre><button class="copy-btn">Copy</button><code>kubectl create -f <file|dir>
-kubectl apply -f <file|dir>
-kubectl delete -f <file|dir>
-kubectl replace -f <file>
-kubectl diff -f <file|dir></code></pre>
+kubectl apply -f {file|dir}
+kubectl delete -f {file|dir}
+kubectl replace -f {file}
+kubectl diff -f {file|dir}
+</code></pre>
 <h4>Logs, Exec, Port‑forward, Copy</h4>
 <pre><button class="copy-btn">Copy</button><code>kubectl logs <pod> -c <container> --tail=100 -f
 kubectl exec -it <pod> -c <container> -- sh
-kubectl port-forward svc/<service> 8080:80
+kubectl port-forward svc/{service_name} 8080:80
+kubectl port-forward pod/nginx 8080:80
 kubectl cp <ns>/<pod>:/path/in/pod ./local/dir</code></pre>
 <h4>Scale & Rollout</h4>
 <pre><button class="copy-btn">Copy</button><code>kubectl scale deploy/<name> --replicas=3
-kubectl set image deploy/<name> <container>=<image:tag>
-kubectl rollout status deploy/<name>
-kubectl rollout history deploy/<name>
-kubectl rollout undo deploy/<name> --to-revision=2</code></pre>
+kubectl set image deploy/{name} <container>=<image:tag>
+kubectl rollout status deploy/{name}
+kubectl rollout history deploy/{name}
+kubectl rollout undo deploy/{name} --to-revision=2</code></pre>
 <h4>Services & Networking</h4>
 <pre><button class="copy-btn">Copy</button><code>kubectl expose deploy/<name> --type=ClusterIP --port=80 --target-port=8080
-kubectl expose deploy/<name> --type=NodePort
-kubectl expose deploy/<name> --type=LoadBalancer --port 80 --target-port 8080
+kubectl expose deploy/{name} --type=NodePort
+kubectl expose deploy/{name} --type=LoadBalancer --port 80 --target-port 8080
 kubectl get svc,ep -o wide -n <ns>
 kubectl run tmp --rm -it --image=busybox --restart=Never -- sh
 nslookup my-svc.my-ns.svc.cluster.local
@@ -395,7 +424,7 @@ kubectl top pods -A</code></pre>
 <pre><button class="copy-btn">Copy</button><code>kubectl create job pi --image=perl -- perl -Mbignum=bpi -wle 'print bpi(1000)'
 kubectl create cronjob backup --image=alpine --schedule="0 2 * * *" -- sh -c 'echo backup'
 kubectl get jobs,cronjobs -A
-kubectl delete job/<name> cronjob/<name></code></pre>
+kubectl delete job/{name} cronjob/{name}</code></pre>
 <h4>ConfigMaps & Secrets</h4>
 <pre><button class="copy-btn">Copy</button><code>kubectl create configmap app --from-literal=ENV=prod
 kubectl create secret generic db --from-literal=USER=admin --from-literal=PASS=secret
@@ -404,7 +433,7 @@ kubectl describe secret db -n <ns></code></pre>
 <h4>Debug & Troubleshoot</h4>
 <pre><button class="copy-btn">Copy</button><code>kubectl describe pod <pod> -n <ns>
 kubectl get events -A --sort-by=.lastTimestamp | tailEphemeral container (if available)kubectl debug -it deploy/<name> --image=busybox --target=<container>
-kubectl debug node/<node> -it --image=busybox</code></pre>    <h3 id="cluster-setup">Cluster Setup</h3>
+kubectl debug node/{node} -it --image=busybox</code></pre>    <h3 id="cluster-setup">Cluster Setup</h3>
     <ul>
       <li><strong>kubeadm:</strong> production‑grade bootstrap</li>
       <li><strong>kind:</strong> multi‑node clusters in Docker (local/dev)</li>
@@ -575,22 +604,9 @@ kubectl create pdb nginx --selector=app=nginx --min-available=2</code></pre>    
     </ul>
     <pre><button class="copy-btn">Copy</button><code>kubectl taint node worker region=useast2:NoSchedule</code></pre>
 
-    <h3 id="workloads">Workloads & Pod Lifecycle</h3>
-    <ul>
-      <li>ReplicaSet, Deployment (stateless), StatefulSet, DaemonSet, Job, CronJob</li>
-      <li>Pod lifecycle: Pending → Running → Succeeded/Failed → Unknown</li>
-      <li>Init containers for ordered startup</li>
-      <li>Container spec: name, image, command, ports, resources, liveness/readiness probes, securityContext</li>
-    </ul>
-
+    
     <!-- NEW: StatefulSet details -->
     <h4 id="statefulset-highlights">StatefulSet highlights</h4>
-    <ul>
-      <li><strong>Stable network identity:</strong> ordered Pod names (e.g., <span class="k">web-0</span>, <span class="k">web-1</span>).</li>
-      <li><strong>Stable persistent storage:</strong> per‑Pod PVCs via <span class="k">volumeClaimTemplates</span>.</li>
-      <li><strong>Ordered, graceful deployment/scaling:</strong> create/terminate Pods sequentially.</li>
-      <li><strong>Ordered rolling updates:</strong> supports partitioned rolling updates for controlled upgrades.</li>
-    </ul>
     <pre><button class="copy-btn">Copy</button><code>apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -654,7 +670,10 @@ helm uninstall myapp</code></pre>
       <li><strong>Metrics:</strong> kube-state-metrics; node-exporter; Prometheus Adapter</li>
       <li><strong>Logging:</strong> node-level collection; sidecars; application-level; tools: fluentd, Filebeat; backends: OpenSearch, Grafana Loki</li>
       <li><strong>Visualization/alerts:</strong> Grafana; Alertmanager</li>
-      <li><strong>Tracing:</strong> Jaeger; OpenTelemetry</li>
+      <li><strong>node Exporter</strong>in Prometheus to extract underneath Node's hardware and OS metrics</li>
+      <li><strong>Prometheus Adapter</strong>Adapting kubernated information to Prometheus, act as bridge, Help to monitor kubenetes cluster effectively</li>
+      <li><strong>kube-state-api</strong>collecte kubecluster objects state by listening to kube api server</li>
+      <li><strong>kube-cost:</strong> help and managing kubenetes cost </li>
     </ul>
     <div class="grid-2">
       <div>
@@ -681,6 +700,8 @@ kubectl logs --since=1h nginx</code></pre>
       <li><strong>CI/CD concepts:</strong> build pipelines, automated tests, artifact repositories, progressive delivery (blue/green, canary)</li>
       <li><strong>GitOps principles:</strong> declarative manifests; desired state in Git; pull‑based reconciler (e.g., Argo CD)</li>
       <li><strong>Best practices:</strong> immutable images; image signing; policy checks (OPA/Kyverno); environment overlays (Kustomize/Helm)</li>
+      <li><strong>Ansible</strong> A toolset for conainer and application lifecycle, infrastructure deployment, automate configuration task </li>
+      <li><strong>Flux</strong>using GitOps tool kit to manage the state of applicatin with desired state in the repo config</li>
     </ul>
     <pre><button class="copy-btn">Copy</button><code># Example: render and apply with Helm (CI step)
 helm template myapp ./chart | kubeval -Example: Argo CD app (declarative)apiVersion: argoproj.io/v1alpha1
@@ -715,7 +736,7 @@ selfHeal: true</code></pre>
 </main>
 
 <footer>
-  Built for speed: single file, zero external deps. Local progress is saved in your browser.
+  Built for Humans by AI
 </footer>
   </div>  <script>
     // Accessibility: focus search with '/'
