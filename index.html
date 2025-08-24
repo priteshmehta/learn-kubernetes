@@ -252,7 +252,7 @@ footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; t
       <li>Open Policy Agent (OPA) (Admission Controller)</li>
       <li>kube-cost(Managing k8s cost)</li> 
       <li>Cilium(eBPF-based Networking & security for k8s)</li>
-      <li>Cortex</li>
+      <li>Cortex (real-time threat prevention and streamline cloud security operation)</li>
     </ul>
   </section>
 
@@ -261,7 +261,7 @@ footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; t
     <h2>Docker History & Predecessors</h2>
     <ul>
       <li>IBM mainframes (CP/CMS), chroot, FreeBSD jails, Solaris Zones, HP‑UX vPars</li>
-      <li>Linux namespaces (user, net, pid, mount, uts, ipc, cgroup, time) and cgroups</li>
+      <li>Linux namespaces (user, net, pid, mount, uts, ipc, time) and cgroups</li>
       <li>Docker: started as dotCloud (2010), renamed in 2013; containers share the host kernel</li>
       <li>runC is donated by Docker, it's a part of Open Conainer Initiative (OCI)</li>
       <li>Union File System (AUFS) - Combines Multiple layers and make docker image with thin writable layer on the top</li>
@@ -277,7 +277,8 @@ docker run nginx
 docker run -it --rm -P alpine:3.20 sh # Publish all mapped ports
 docker inspect {image_name}
 docker manifest inspect {image:tag}
-docker save {image} -o /tmp/image.tarBuildx (multi-arch)docker buildx create --name buildx-multi-arch
+docker save {image} -o /tmp/image.tar
+docker buildx create --name buildx-multi-arch
 docker buildx use buildx-multi-arch
 docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t user/app:tag 
 docker info | grep -i "Storage Driver"
@@ -296,7 +297,7 @@ docker system prune  #Remove all unused containers, networks, images
       <div>
         <h4 id="k8s-architecture">Control Plane</h4>
         <ul>
-          <li>kube-Apiserver (front door; often behind a load balancer)</li>
+          <li>kube-ApiServer (front door; often behind a load balancer)</li>
           <li>kube-Scheduler</li>
           <li>kube-Controller-manager (controller loops)</li>
           <li>etcd (strongly consistent distributed key‑value store; RAFT)</li>
@@ -332,6 +333,13 @@ docker system prune  #Remove all unused containers, networks, images
           <li>Init containers for ordered startup</li>
           <li>Container spec: name, image, command, ports, resources, liveness/readiness probes, securityContext</li>
         </ul>
+      <li>Namespaces
+        <ul>
+          <li>ResourceQuotas, LimitRanges; access control via RBAC</li>
+          <li>Default: default, kube-public, kube-system, kube-node-lease</li>
+        </ul>
+      </li>
+
       <li>StatefulSet - for persistent storage like Database/kafka apps (namespace level scoped)</li>
           <ul>
             <li><strong>Stable network identity:</strong> ordered Pod names (e.g., <span class="k">web-0</span>, <span class="k">web-1</span>).</li>
@@ -372,6 +380,10 @@ docker system prune  #Remove all unused containers, networks, images
       <li>External ↔ Service: kube-proxy and node packet filtering</li>
     </ol>
     <h3 id="kubectl-basics">kubectl Basics Commands Cheet Sheet</h3>
+    <ul>
+      <li><a href="https://labs.play-with-k8s.com" target="_blank"><strong>Kubernetes Playground</strong></a></li>
+      <li><a href="https://www.pluralsight.com/resources/blog/cloud/kubernetes-cheat-sheet" target="_blank"><strong>Kubernetes commands </strong></a></li>
+    </ul>
     <pre><code>
     <h4>Contexts & Cluster Info</h4>
     <pre><button class="copy-btn">Copy</button><code>
@@ -396,7 +408,9 @@ kubectl top {pods|nodes}
 kubectl run --image ubuntu ubuntu -- sleep infinity
 kubectl set image deploy/{name} {container}={image:tag}
 kubectl get deploy,rs,po -o wide --selector=role=app
-kubectl describe pod {pod} -n {ns}
+kubectl get pods --show-labels
+kubectl get ds --all-namespaces  #Daemonsets 
+kubectl describe pod {pod} -n {ns} 
 kubectl exec -it {pod} -c {container} -- {command}
 kubectl delete pod/nginx --now
 kubectl delete -f {file|dir} 
@@ -470,20 +484,8 @@ kubectl create clusterrolebinding cluster-superhero --cluster-role=cluster-super
 kubectl auth can-i '' ''
 kubectl auth can-i '' '' --as-group=cluster-superheroes --as="superman"</code></pre>
 
-    <h3 id="namespaces">Namespaces</h3>
-    <ul>
-      <li>ResourceQuotas, LimitRanges; access control via RBAC</li>
-      <li>Default: <span class="k">default</span>, <span class="k">kube-public</span>, <span class="k">kube-system</span>, <span class="k">kube-node-lease</span></li>
-    </ul>
     <h3 id="services">Services</h3>
     <p>Types: ClusterIP, NodePort, LoadBalancer, ExternalName (plus headless Service with no cluster IP)</p>
-    <pre><button class="copy-btn">Copy</button><code># Expose a Deployment (dry-run)
-kubectl expose deployment/nginx --dry-run=client -o yaml
-kubectl get services
-kubectl get endpoints
-kubectl describe service/nginxPort-forward to a Servicekubectl port-forward service/nginx 8080:80DNS: <service>.<namespace>.svc.cluster.localkubectl expose deployment/nginx --type=NodePort
-kubectl expose deployment/nginx --type=LoadBalancer --port 8080 --target-port 80
-kubectl create service externalname my-service --external-name nginx.default.svc.cluster.local</code></pre>
     <h3 id="labels">Labels & Selectors</h3>
     <ul><li>Metadata for resources; used by Services, NetworkPolicies, rollouts, monitoring, and cost tools</li></ul>
     <pre><button class="copy-btn">Copy</button><code>kubectl get all --selector=&lt;label&gt;=&lt;value&gt;</code></pre>
@@ -651,7 +653,6 @@ helm uninstall myapp</code></pre>
       <li><strong>kube-state-api</strong>collecte kubecluster objects state by listening to kube api server</li>
       <li><strong>kube-cost:</strong> help and managing kubenetes cost </li>
     </ul>
-</div>
 </section>  <!-- Cloud Native Application Delivery -->
   <section id="app-delivery" class="card">
     <h2>Application Delivery</h2>
@@ -663,23 +664,8 @@ helm uninstall myapp</code></pre>
       <li><strong>Flux</strong>using GitOps tool kit to manage the state of applicatin with desired state in the repo config</li>
     </ul>
     <pre><button class="copy-btn">Copy</button><code># Example: render and apply with Helm (CI step)
-helm template myapp ./chart | kubeval -Example: Argo CD app (declarative)apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-name: myapp
-spec:
-project: default
-source:
-repoURL: https://github.com/acme/myapp
-path: deploy/overlays/prod
-targetRevision: main
-destination:
-server: https://kubernetes.default.svc
-namespace: myapp
-syncPolicy:
-automated:
-prune: true
-selfHeal: true</code></pre>
+helm template myapp ./chart | kubeval -Example: Argo CD app
+</code></pre>
 </section>  <!-- Resources -->
   <section id="resources" class="card">
     <h2>Resources</h2>
@@ -692,6 +678,7 @@ selfHeal: true</code></pre>
       <li><a href="https://github.com/cncf/curriculum/tree/master/kcna" target="_blank" rel="noopener">CNCF KCNA curriculum</a></li>
     </ul>
   </section>
+</div>
 </main>
 
 <footer>
