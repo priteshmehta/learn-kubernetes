@@ -238,6 +238,7 @@ footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; t
       <li>CoreDNS (DNS plug-in)</li>
       <li>CRI-O (default container runtime in k8s)</li>
       <li>Prometheus (Monitoring)</li>
+      <li>Thanos - Prometheus at scale</li>
       <li>Helm (Managing/installing k8s applications)</li>
       <li>Istio (Feature-rich but complex Service Mash)</li>
       <li>LinkerD(simple & powerful tool to add security/observability/reliability to k8s)</li>
@@ -246,10 +247,12 @@ footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; t
       <li>Argo CD (GitOps for App delivery)</li>
       <li>OpenTelemetry / OpenTracing</li>
       <li>CloudEvents</li>
+      <li>Rook(cloud-native storage orchestrator for k8s, providing the platform, framework & support for a diverse set of storage solutions)</li>
       <li>OpenID Connect (OIDC) (largescale k8s user Authentication)</li>
       <li>Open Policy Agent (OPA) (Admission Controller)</li>
       <li>kube-cost(Managing k8s cost)</li> 
       <li>Cilium(eBPF-based Networking & security for k8s)</li>
+      <li>Cortex</li>
     </ul>
   </section>
 
@@ -267,7 +270,7 @@ footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; t
 
   <!-- Docker Commands -->
   <section id="docker-commands" class="card">
-    <h2>Docker Commands & Cheat Sheet</h2>
+    <h2>Docker Commands</h2>
     <pre><button class="copy-btn">Copy</button><code>
 docker version
 docker run nginx
@@ -282,7 +285,7 @@ docker system prune  #Remove all unused containers, networks, images
 </code></pre>
 </section>  <!-- Kubernetes: Architecture & Topics -->
   <section id="kubernetes" class="card">
-    <h2>Kubernetes: Architecture & Core Topics</h2>
+    <h2>Kubernetes: Architecture</h2>
 
     <div class="grid-2">
       <div>
@@ -313,6 +316,13 @@ docker system prune  #Remove all unused containers, networks, images
           <li>CNI - Container Networking Interface for overlay network</li>
         </ul>
       </div>
+      <div><h3 id="cluster-setup">Cluster Setup</h3>
+        <ul>
+          <li><strong>kubeadm:</strong> production‑grade bootstrap</li>
+          <li><strong>kind:</strong> multi‑node clusters in Docker (local/dev)</li>
+          <li><strong>minikube / MicroK8s:</strong> local development</li>
+        </ul>
+      </div>
     </div>
     <h4>Kubernetes Objects</h4>
     <ol>
@@ -330,10 +340,28 @@ docker system prune  #Remove all unused containers, networks, images
             <li><strong>Ordered rolling updates:</strong> supports partitioned rolling updates for controlled upgrades.</li>
           </ul>
       <li>DaemonSet - mostly running one pod per node (cluster level scoped)</li>
-      <li>Crobjob/Job - pod will be terminated after job finishes (can scheduled and control runing timeout, backoff etc..)</li>
+      <li>Crobjob/Job - pod will be terminated after job finishes (can scheduled and control runing timeout, backoff etc..)
+          <ul>
+            <li>Manage and track tasks with retries on failure</li>
+            <li>Use CronJobs for backups and scheduled maintenance</li>
+          </ul>
+      </li>
       <li>ConfigMap - A readonly settings as key/value for containers running in pod (namespace level scoped)</li>
-      <li>Secret - </li>
-      <li>Scheduling - </li>
+      <li>Secret -
+        <ul>
+          <li>Harden base images; secure CI/CD; AppArmor/SELinux</li>
+          <li>Admission control (PSP removed in 1.25 → use Kyverno or OPA Gatekeeper)</li>
+          <li>Falco (runtime detection); OIDC; Kubescape (misconfiguration & vulnerability scanning)</li>
+        </ul>
+      </li>
+      <li>Scheduling
+            <ul>
+                <li><strong>nodeSelector</strong> matches node labels</li>
+                <li><strong>Affinity/anti‑affinity</strong> (preferred or required)</li>
+                <li><strong>Topology spread constraints</strong> distribute Pods across zones/regions</li>
+                <li><strong>Taints & Tolerations</strong> (NoSchedule, PreferNoSchedule, NoExecute)</li>
+            </ul>
+       </li>
     </ol>
 
     <h4>Networking paths</h4>
@@ -343,121 +371,111 @@ docker system prune  #Remove all unused containers, networks, images
       <li>Pod ↔ Service: kube-proxy and node packet filtering</li>
       <li>External ↔ Service: kube-proxy and node packet filtering</li>
     </ol>
-
-    <h3 id="kubectl-basics">kubectl Basics</h3>
-    <div class="grid-1">
-      <div>
-        <pre><button class="copy-btn">Copy</button><code>kubectl top
-kubectl api-resources | more
-kubectl get all -A
-kubectl top pods  
-kubectl run --image ubuntu ubuntu -- sleep infinity
-kubectl get deploy,rs,po -o wide --selector=role=app
-kubectl describe pod {pod} -n {ns}
-kubectl delete pod/nginx --now 
-kubectl explain pod.spec.restartPolicy # help
-kubectl apply -f combined.yml #combine multiple files
-kubectl exec -it {pod} -c {container} -- {command}  #Exec into a container
-</code></pre>
-</div>
-</div>
-<h3 id="kubectl-cheatsheet">kubectl Cheat Sheet</h3>
+    <h3 id="kubectl-basics">kubectl Basics Commands Cheet Sheet</h3>
+    <pre><code>
     <h4>Contexts & Cluster Info</h4>
     <pre><button class="copy-btn">Copy</button><code>
-kubectl config get-contexts
-kubectl config use-context {context}
-kubectl config set-context --current --namespace={ns}
-kubectl config view --minify
-kubectl cluster-info
-kubectl version --short
-</code></pre>
-
-<h4>Get, Describe, Watch</h4>
+  kubectl version --short
+  kubectl api-resources | more
+  kubectl get all -A
+  kubectl version --short
+  kubectl api-resources | more
+  kubectl get all -A
+  kubectl cluster-info
+    </code></pre>
+<h4>Config detail</h4>
 <pre><button class="copy-btn">Copy</button><code>
-kubectl get pods -A -o wide
-
-kubectl get events --sort-by=.lastTimestamp
-kubectl get <kind> <name> -o yaml
-kubectl get pod <pod> -o jsonpath='{.spec.containers[*].image}'</code></pre>
-<h4>Create / Apply / Delete</h4>
-<pre><button class="copy-btn">Copy</button><code>kubectl create -f <file|dir>
-kubectl apply -f {file|dir}
-kubectl delete -f {file|dir}
-kubectl replace -f {file}
-kubectl diff -f {file|dir}
+  kubectl config view --minify
+  kubectl config get-contexts
+  kubectl config use-context {context}
+  kubectl config set-context --current --namespace={ns}
 </code></pre>
-<h4>Logs, Exec, Port‑forward, Copy</h4>
-<pre><button class="copy-btn">Copy</button><code>kubectl logs <pod> -c <container> --tail=100 -f
-kubectl exec -it <pod> -c <container> -- sh
-kubectl port-forward svc/{service_name} 8080:80
-kubectl port-forward pod/nginx 8080:80
-kubectl cp <ns>/<pod>:/path/in/pod ./local/dir</code></pre>
-<h4>Scale & Rollout</h4>
-<pre><button class="copy-btn">Copy</button><code>kubectl scale deploy/<name> --replicas=3
-kubectl set image deploy/{name} <container>=<image:tag>
-kubectl rollout status deploy/{name}
-kubectl rollout history deploy/{name}
-kubectl rollout undo deploy/{name} --to-revision=2</code></pre>
-<h4>Services & Networking</h4>
-<pre><button class="copy-btn">Copy</button><code>kubectl expose deploy/<name> --type=ClusterIP --port=80 --target-port=8080
+<h4>Deployments and Rollout</h4>
+<pre><button class="copy-btn">Copy</button><code>
+kubectl top {pods|nodes}  
+kubectl run --image ubuntu ubuntu -- sleep infinity
+kubectl set image deploy/{name} {container}={image:tag}
+kubectl get deploy,rs,po -o wide --selector=role=app
+kubectl describe pod {pod} -n {ns}
+kubectl exec -it {pod} -c {container} -- {command}
+kubectl delete pod/nginx --now
+kubectl delete -f {file|dir} 
+kubectl explain pod.spec.restartPolicy
+kubectl apply -f combined.yml
+kubectl annotate deployment/nginx kubernetes.io/change-cause="initial version"
 kubectl expose deploy/{name} --type=NodePort
 kubectl expose deploy/{name} --type=LoadBalancer --port 80 --target-port 8080
-kubectl get svc,ep -o wide -n <ns>
-kubectl run tmp --rm -it --image=busybox --restart=Never -- sh
-nslookup my-svc.my-ns.svc.cluster.local
-curl -s http://my-svc:80</code></pre>
-<h4>Namespaces & RBAC</h4>
-<pre><button class="copy-btn">Copy</button><code>kubectl create ns demo
+kubectl get svc, endpoints -o wide
+kubectl rollout status deploy/{name}
+kubectl rollout history deploy/{name}
+kubectl rollout undo deploy/{name} --to-revision=2
+kubectl replace -f {file}
+kubectl diff -f {file|dir}
+kubectl get events --sort-by=.lastTimestamp
+kubectl port-forward svc/{service_name} 8080:80
+kubectl port-forward pod/nginx 8080:80
+kubectl cp {ns}/{pod}:/path/in/pod ./local/dir
+kubectl scale deploy/{name} --replicas=3
 kubectl get role,rolebinding -n demo
-kubectl create role read-pods --verb=get,list,watch --resource=pods -n demo
-kubectl create rolebinding read-pods --role=read-pods --serviceaccount=demo:default -n demo
-kubectl auth can-i list pods --as system:serviceaccount:demo:default -n demo</code></pre>
-<h4>Scheduling & Nodes</h4>
-<pre><button class="copy-btn">Copy</button><code>kubectl cordon <node>
-kubectl drain <node> --ignore-daemonsets --delete-emptydir-data
-kubectl uncordon <node>
-kubectl taint nodes <node> key=value:NoSchedule
-kubectl label node <node> pool=blue --overwrite
-kubectl top nodes
-kubectl top pods -A</code></pre>
-<h4>Jobs & CronJobs</h4>
-<pre><button class="copy-btn">Copy</button><code>kubectl create job pi --image=perl -- perl -Mbignum=bpi -wle 'print bpi(1000)'
+kubectl create role red-pods --verb=get,list,watch --resource=pods -n demo
+kubectl create rolebinding red-pods --role=red-pods --serviceaccount=demo:default -n demo
+kubectl auth can-i list pods --as system:serviceaccount:demo:default -n demo
+</code></pre>
+<h4>CronJobs & Jobs</h4>
+<pre><button class="copy-btn">Copy</button><code>
+kubectl create job pi --image=perl -- perl -Mbignum=bpi -wle 'print bpi(1000)'
 kubectl create cronjob backup --image=alpine --schedule="0 2 * * *" -- sh -c 'echo backup'
+kubectl create cronjob my-cron-job --image={image} --schedule="*/5 * * * *" --  {cmd}
 kubectl get jobs,cronjobs -A
-kubectl delete job/{name} cronjob/{name}</code></pre>
+kubectl delete job/{name} cronjob/{name}
+</code></pre>
+<h4>Scheduling & Nodes</h4>
+<pre><button class="copy-btn">Copy</button><code>
+kubectl cordon {node}
+kubectl drain {node} --ignore-daemonsets --delete-emptydir-data
+kubectl uncordon {node}
+kubectl taint nodes {node} key=value:NoSchedule
+kubectl label node {node} pool=blue --overwrite
+kubectl top nodes
+kubectl top pods -A
+</code></pre>
 <h4>ConfigMaps & Secrets</h4>
-<pre><button class="copy-btn">Copy</button><code>kubectl create configmap app --from-literal=ENV=prod
+<pre><button class="copy-btn">Copy</button><code>
+kubectl create configmap my-config --from-literal=ENV=prod --from-literal=key2=value2
+kubectl create configmap my-config --from-env-file=.env
 kubectl create secret generic db --from-literal=USER=admin --from-literal=PASS=secret
-kubectl get cm,secret -n <ns>
-kubectl describe secret db -n <ns></code></pre>
+kubectl get cm,secret
+kubectl describe secret db
+</code></pre>
 <h4>Debug & Troubleshoot</h4>
-<pre><button class="copy-btn">Copy</button><code>kubectl describe pod <pod> -n <ns>
-kubectl get events -A --sort-by=.lastTimestamp | tailEphemeral container (if available)kubectl debug -it deploy/<name> --image=busybox --target=<container>
-kubectl debug node/{node} -it --image=busybox</code></pre>    <h3 id="cluster-setup">Cluster Setup</h3>
-    <ul>
-      <li><strong>kubeadm:</strong> production‑grade bootstrap</li>
-      <li><strong>kind:</strong> multi‑node clusters in Docker (local/dev)</li>
-      <li><strong>minikube / MicroK8s:</strong> local development</li>
-    </ul>
+<pre><button class="copy-btn">Copy</button><code>
+kubectl describe pod {pod} -n {ns}
+kubectl get events -A --sort-by=.lastTimestamp | tailEphemeral container (if available)
+kubectl debug -it deploy/{name} --image=busybox --target={container}
+kubectl debug node/{node} -it --image=busybox
+kubectl logs nginx
+kubectl logs -p -c ruby web-1
+kubectl logs -f -c ruby web-1
+kubectl logs --tail=20 nginx
+kubectl logs --since=1h nginx
+</code></pre>
+</code></pre>
+<pre><button class="copy-btn">Copy</button><code>
+~/.kube/config
+KUBECONFIG={file} kubectl config view --raw
+kubectl get clusterrolebindings
+kubectl describe clusterrole/cluster-admin
+kubectl create clusterrole cluster-superhero --verb='' --resource=''
+kubectl create clusterrolebinding cluster-superhero --cluster-role=cluster-superhero --group=cluster-superheroes
+kubectl auth can-i '' ''
+kubectl auth can-i '' '' --as-group=cluster-superheroes --as="superman"</code></pre>
 
     <h3 id="namespaces">Namespaces</h3>
     <ul>
       <li>ResourceQuotas, LimitRanges; access control via RBAC</li>
       <li>Default: <span class="k">default</span>, <span class="k">kube-public</span>, <span class="k">kube-system</span>, <span class="k">kube-node-lease</span></li>
     </ul>
-    <pre><button class="copy-btn">Copy</button><code>kubectl config view
-kubectl create namespace my-namespace
-kubectl config set-context --current --namespace=my-namespace</code></pre>    <h3 id="deployments">Deployments</h3>
-    <ul><li>Manage updates, replicas, and rollbacks</li></ul>
-    <pre><button class="copy-btn">Copy</button><code>kubectl create deployment nginx --image=nginx -o yaml | tee deployment.yaml | kubectl apply -f -
-kubectl get deployment -o wide
-kubectl rollout history deployment/nginx
-kubectl annotate deployment/nginx kubernetes.io/change-cause="initial version"
-kubectl apply -f deployment.yaml && kubectl rollout status deployment/nginx
-kubectl set image deployment/nginx nginx=nginx:stable && kubectl rollout status deployment/nginx
-kubectl describe deployment/nginx
-kubectl rollout undo deployment/nginx
-kubectl scale deployment/nginx --replicas=10</code></pre>    <h3 id="services">Services</h3>
+    <h3 id="services">Services</h3>
     <p>Types: ClusterIP, NodePort, LoadBalancer, ExternalName (plus headless Service with no cluster IP)</p>
     <pre><button class="copy-btn">Copy</button><code># Expose a Deployment (dry-run)
 kubectl expose deployment/nginx --dry-run=client -o yaml
@@ -465,20 +483,7 @@ kubectl get services
 kubectl get endpoints
 kubectl describe service/nginxPort-forward to a Servicekubectl port-forward service/nginx 8080:80DNS: <service>.<namespace>.svc.cluster.localkubectl expose deployment/nginx --type=NodePort
 kubectl expose deployment/nginx --type=LoadBalancer --port 8080 --target-port 80
-kubectl create service externalname my-service --external-name nginx.default.svc.cluster.local</code></pre>    <h3 id="jobs">Jobs & CronJobs</h3>
-    <ul>
-      <li>Manage and track tasks with retries on failure</li>
-      <li>Use CronJobs for backups and scheduled maintenance</li>
-    </ul>
-    <pre><button class="copy-btn">Copy</button><code>kubectl create job calculatepi --image=perl:5.34.0 -- perl -Mbignum=bpi -wle 'print bpi(2000)'
-kubectl get jobs
-kubectl create cronjob my-cron-job --image=<image> --schedule="*/5 * * * *" -- <cmd>Limit history in spec.spec.successfulJobsHistoryLimit</code></pre>    <h3 id="configmaps">ConfigMaps</h3>
-    <p>Decouple configuration from Pods. Use as environment variables or mount as files.</p>
-    <pre><button class="copy-btn">Copy</button><code>kubectl create configmap my-config --from-literal=key1=value1 --from-literal=key2=value2
-kubectl create configmap my-config --from-env-file=.env</code></pre>    <h3 id="secrets">Secrets</h3>
-    <p>Store credentials and sensitive data. Base64 encodes values; use external KMS for strong encryption.</p>
-    <pre><button class="copy-btn">Copy</button><code>kubectl create secret generic my-secret --from-literal=colour=red</code></pre>
-
+kubectl create service externalname my-service --external-name nginx.default.svc.cluster.local</code></pre>
     <h3 id="labels">Labels & Selectors</h3>
     <ul><li>Metadata for resources; used by Services, NetworkPolicies, rollouts, monitoring, and cost tools</li></ul>
     <pre><button class="copy-btn">Copy</button><code>kubectl get all --selector=&lt;label&gt;=&lt;value&gt;</code></pre>
@@ -508,14 +513,7 @@ curl http://127.0.0.1:&lt;port&gt;/openapi/v3</code></pre>    <h3 id="rbac">RBAC
       <li>Kubeconfig stores cluster/server and client credentials</li>
       <li>ClusterRole/ClusterRoleBinding (cluster‑wide); Role/RoleBinding (namespaced)</li>
     </ul>
-    <pre><button class="copy-btn">Copy</button><code>~/.kube/config
-KUBECONFIG=<file> kubectl config view --raw
-kubectl get clusterrolebindings
-kubectl describe clusterrole/cluster-admin
-kubectl create clusterrole cluster-superhero --verb='' --resource=''
-kubectl create clusterrolebinding cluster-superhero --cluster-role=cluster-superhero --group=cluster-superheroes
-kubectl auth can-i '' ''
-kubectl auth can-i '' '' --as-group=cluster-superheroes --as="superman"</code></pre>    <h3 id="scheduler">Scheduler & Placement</h3>
+        <h3 id="scheduler">Scheduler & Placement</h3>
     <ul>
       <li>Phases: filter nodes → score nodes → bind Pod</li>
       <li><span class="k">schedulerName</span> for custom schedulers</li>
@@ -554,13 +552,6 @@ kubectl auth can-i '' '' --as-group=cluster-superheroes --as="superman"</code></
   <li><strong>Static vs dynamic:</strong> you can create PVs manually (static) or let the StorageClass dynamically provision PVs when a PVC is created.</li>
 </ul>
 
-<h3 id="storage">Storage & Stateful</h3>
-<ul>
-  <li>CSI drivers: Amazon EBS, GCE PD, Azure Disk, Ceph, GlusterFS, NFS, etc.</li>
-  <li>PersistentVolumes (PV) and PersistentVolumeClaims (PVC)</li>
-  <li>Rook (CNCF) for storage orchestration</li>
-</ul>
-
 <h3 id="network-policy">Network Policies</h3>
 <ul>
   <li>Isolate Pods by IP/namespace selectors; <strong>ingress</strong> and <strong>egress</strong>; policies are cumulative</li>
@@ -568,76 +559,61 @@ kubectl auth can-i '' '' --as-group=cluster-superheroes --as="superman"</code></
 </ul>
 
 <h3 id="security">Security</h3>
-<ul>
-  <li>Harden base images; secure CI/CD; AppArmor/SELinux</li>
-  <li>Admission control (PSP removed in 1.25 → use Kyverno or OPA Gatekeeper)</li>
-  <li>Falco (runtime detection); OIDC; Kubescape (misconfiguration & vulnerability scanning)</li>
-</ul>
+
 <pre><button class="copy-btn">Copy</button><code># SecurityContext example
-
-
 spec:
 securityContext:
 runAsUser: 1000
 runAsGroup: 1000
-containers:
-
-name: app
-image: example
-securityContext:
 allowPrivilegeEscalation: false</code></pre>
 <h3 id="pdb">Pod Disruption Budgets (PDB) & Maintenance</h3>
 <ol>
   <li>Cordon node → drain → workloads move → uncordon</li>
 </ol>
-<pre><button class="copy-btn">Copy</button><code>kubectl cordon &lt;node&gt;
+<pre><button class="copy-btn">Copy</button><code>
+kubectl cordon {node}
+kubectl drain {node} --ignore-daemonsets --delete-emptydir-data
+kubectl uncordon {node}
+kubectl create pdb nginx --selector=app=nginx --min-available=2
+</code></pre>
+<h3 id="scheduling-objects">Scheduling: Selectors, Affinity, Taints</h3>
 
-
-kubectl drain <node> --ignore-daemonsets --delete-emptydir-data
-kubectl uncordon <node>
-kubectl create pdb nginx --selector=app=nginx --min-available=2</code></pre>    <h3 id="scheduling-objects">Scheduling: Selectors, Affinity, Taints</h3>
-    <ul>
-      <li><strong>nodeSelector</strong> matches node labels</li>
-      <li><strong>Affinity/anti‑affinity</strong> (preferred or required)</li>
-      <li><strong>Topology spread constraints</strong> distribute Pods across zones/regions</li>
-      <li><strong>Taints & Tolerations</strong> (NoSchedule, PreferNoSchedule, NoExecute)</li>
-    </ul>
     <pre><button class="copy-btn">Copy</button><code>kubectl taint node worker region=useast2:NoSchedule</code></pre>
 
-    
-    <!-- NEW: StatefulSet details -->
-    <h4 id="statefulset-highlights">StatefulSet highlights</h4>
-    <pre><button class="copy-btn">Copy</button><code>apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-name: web
-spec:
-serviceName: web
-replicas: 3
-selector:
-matchLabels: { app: web }
-updateStrategy:
-type: RollingUpdate
-template:
-metadata: { labels: { app: web } }
-spec:
-containers:
-- name: app
-image: nginx:stable
-ports: [{ name: http, containerPort: 80 }]
-volumeMounts:
-- name: data
-mountPath: /var/www
-volumeClaimTemplates:
 
-metadata:
-name: data
-spec:
-accessModes: ["ReadWriteOnce"]
-storageClassName: fast
-resources:
-requests:
-storage: 5Gi
+    <h3 id="statefulset-highlights">StatefulSet highlights</h3>
+    <pre><button class="copy-btn">Copy</button><code>
+      apiVersion: apps/v1
+      kind: StatefulSet
+      metadata:
+      name: web
+      spec:
+      serviceName: web
+      replicas: 3
+      selector:
+      matchLabels: { app: web }
+      updateStrategy:
+      type: RollingUpdate
+      template:
+      metadata: { labels: { app: web } }
+      spec:
+      containers:
+      - name: app
+      image: nginx:stable
+      ports: [{ name: http, containerPort: 80 }]
+      volumeMounts:
+      - name: data
+      mountPath: /var/www
+      volumeClaimTemplates:
+
+      metadata:
+      name: data
+      spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: fast
+      resources:
+      requests:
+      storage: 5Gi
 </code></pre>
   </section>
   <!-- Helm -->
@@ -675,27 +651,10 @@ helm uninstall myapp</code></pre>
       <li><strong>kube-state-api</strong>collecte kubecluster objects state by listening to kube api server</li>
       <li><strong>kube-cost:</strong> help and managing kubenetes cost </li>
     </ul>
-    <div class="grid-2">
-      <div>
-        <pre><button class="copy-btn">Copy</button><code># Logs
-docker logs nginx
-kubectl logs nginx
-kubectl logs -p -c ruby web-1
-kubectl logs -f -c ruby web-1
-kubectl logs --tail=20 nginx
-kubectl logs --since=1h nginx</code></pre>
-</div>
-<div>
-<div class="tag-row">
-<span class="tag">Thanos (Prometheus at scale)</span>
-<span class="tag">Cortex</span>
-<span class="tag">OpenTelemetry</span>
-</div>
-</div>
 </div>
 </section>  <!-- Cloud Native Application Delivery -->
   <section id="app-delivery" class="card">
-    <h2>Cloud Native Application Delivery</h2>
+    <h2>Application Delivery</h2>
     <ul>
       <li><strong>CI/CD concepts:</strong> build pipelines, automated tests, artifact repositories, progressive delivery (blue/green, canary)</li>
       <li><strong>GitOps principles:</strong> declarative manifests; desired state in Git; pull‑based reconciler (e.g., Argo CD)</li>
@@ -723,7 +682,7 @@ prune: true
 selfHeal: true</code></pre>
 </section>  <!-- Resources -->
   <section id="resources" class="card">
-    <h2>Resources & Pointers</h2>
+    <h2>Resources</h2>
     <ul>
       <li><a href="https://github.com/walidshaari/Kubernetes-and-Cloud-Native-Associate" target="_blank" rel="noopener">Kubernetes and Cloud Native Associate</a></li>
       <li><a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/architecture/" target="_blank" rel="noopener">GitOps with Argo CD</a></li>
