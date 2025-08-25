@@ -252,7 +252,6 @@ footer{grid-column:1/-1; margin-top:12px; color:var(--muted); font-size:.9rem; t
       <li>Open Policy Agent (OPA) (Admission Controller)</li>
       <li>kube-cost(Managing k8s cost)</li> 
       <li>Cilium(eBPF-based Networking & security for k8s)</li>
-      <li>Cortex (real-time threat prevention and streamline cloud security operation)</li>
     </ul>
   </section>
 
@@ -314,60 +313,60 @@ docker system prune  #Remove all unused containers, networks, images
           <li>Container runtime: containerd with CRI-O/runC/crun/Kata/gVisor</li>
           <li>Kube-Proxy runs DaemonSet on each node</li>
           <li>Worker node can be linux or window</li>
-          <li>CNI - Container Networking Interface for overlay network</li>
+          <li>CNI - Container Networking Interface for overlay network. Responsible to enforeces NetworkPolicy</li>
         </ul>
       </div>
       <div><h3 id="cluster-setup">Cluster Setup</h3>
         <ul>
           <li><strong>kubeadm:</strong> production‑grade bootstrap</li>
-          <li><strong>kind:</strong> multi‑node clusters in Docker (local/dev)</li>
+          <li><strong>kinD:</strong> multi‑node clusters in Docker (local/dev)</li>
           <li><strong>minikube / MicroK8s:</strong> local development</li>
         </ul>
       </div>
     </div>
     <h4>Kubernetes Objects</h4>
     <ol>
-      <li>Deployment -> Replicaset -> Pods for stateless apps (namespace level scoped)</li>
+      <li><strong>Deployment -> Replicaset -> Pods for stateless apps (namespace level scoped)</strong></li>
         <ul>
           <li>Pod lifecycle: Pending → Running → Succeeded/Failed → Unknown</li>
           <li>Init containers for ordered startup</li>
           <li>Container spec: name, image, command, ports, resources, liveness/readiness probes, securityContext</li>
         </ul>
-      <li>Namespaces
+      <li><strong>Namespaces</strong>
         <ul>
           <li>ResourceQuotas, LimitRanges; access control via RBAC</li>
           <li>Default: default, kube-public, kube-system, kube-node-lease</li>
         </ul>
       </li>
 
-      <li>StatefulSet - for persistent storage like Database/kafka apps (namespace level scoped)</li>
+      <li><strong>StatefulSet</strong> - for persistent storage like Database/kafka apps (namespace level scoped)</li>
           <ul>
-            <li><strong>Stable network identity:</strong> ordered Pod names (e.g., <span class="k">web-0</span>, <span class="k">web-1</span>).</li>
+            <li>Stable network identity: ordered Pod names (e.g., <span class="k">web-0</span>, <span class="k">web-1</span>).</li>
             <li><strong>Stable persistent storage:</strong> per‑Pod PVCs via <span class="k">volumeClaimTemplates</span>.</li>
             <li><strong>Ordered, graceful deployment/scaling:</strong> create/terminate Pods sequentially.</li>
             <li><strong>Ordered rolling updates:</strong> supports partitioned rolling updates for controlled upgrades.</li>
           </ul>
-      <li>DaemonSet - mostly running one pod per node (cluster level scoped)</li>
-      <li>Crobjob/Job - pod will be terminated after job finishes (can scheduled and control runing timeout, backoff etc..)
+      <li><strong>DaemonSet:</strong> mostly running one pod per node (cluster level scoped)</li>
+      <li><strong>Crobjob/Job:</strong> pod will be terminated after job finishes (can scheduled and control runing timeout, backoff etc..)
           <ul>
             <li>Manage and track tasks with retries on failure</li>
             <li>Use CronJobs for backups and scheduled maintenance</li>
           </ul>
       </li>
-      <li>ConfigMap - A readonly settings as key/value for containers running in pod (namespace level scoped)</li>
-      <li>Secret -
+      <li><strong>ConfigMap</strong>: A readonly settings as key/value for containers running in pod (namespace level scoped)</li>
+      <li><strong>Secret:</strong>
         <ul>
           <li>Harden base images; secure CI/CD; AppArmor/SELinux</li>
           <li>Admission control (PSP removed in 1.25 → use Kyverno or OPA Gatekeeper)</li>
           <li>Falco (runtime detection); OIDC; Kubescape (misconfiguration & vulnerability scanning)</li>
         </ul>
       </li>
-      <li>Scheduling
+      <li><strong>Scheduling:</strong>
             <ul>
-                <li><strong>nodeSelector</strong> matches node labels</li>
-                <li><strong>Affinity/anti‑affinity</strong> (preferred or required)</li>
-                <li><strong>Topology spread constraints</strong> distribute Pods across zones/regions</li>
-                <li><strong>Taints & Tolerations</strong> (NoSchedule, PreferNoSchedule, NoExecute)</li>
+                <li>nodeSelector matches node labels</li>
+                <li>Affinity/anti‑affinity (preferred or required)</li>
+                <li>Topology spread constraints distribute Pods across zones/regions</li>
+                <li>Taints & Tolerations (NoSchedule, PreferNoSchedule, NoExecute)</li>
             </ul>
        </li>
     </ol>
@@ -382,7 +381,7 @@ docker system prune  #Remove all unused containers, networks, images
     <h3 id="kubectl-basics">kubectl Basics Commands Cheet Sheet</h3>
     <ul>
       <li><a href="https://labs.play-with-k8s.com" target="_blank"><strong>Kubernetes Playground</strong></a></li>
-      <li><a href="https://www.pluralsight.com/resources/blog/cloud/kubernetes-cheat-sheet" target="_blank"><strong>Kubernetes commands </strong></a></li>
+      <li><a href="https://kubernetes.io/docs/reference/kubectl/quick-reference" target="_blank"><strong>Kubernetes command Quick Reference </strong></a></li>
     </ul>
     <pre><code>
     <h4>Contexts & Cluster Info</h4>
@@ -391,8 +390,6 @@ docker system prune  #Remove all unused containers, networks, images
   kubectl api-resources | more
   kubectl get all -A
   kubectl version --short
-  kubectl api-resources | more
-  kubectl get all -A
   kubectl cluster-info
     </code></pre>
 <h4>Config detail</h4>
@@ -413,27 +410,23 @@ kubectl get ds --all-namespaces  #Daemonsets
 kubectl describe pod {pod} -n {ns} 
 kubectl exec -it {pod} -c {container} -- {command}
 kubectl delete pod/nginx --now
-kubectl delete -f {file|dir} 
 kubectl explain pod.spec.restartPolicy
-kubectl apply -f combined.yml
+kubectl apply -f {file.yaml|dir|dir|url}
+kubectl delete -f {file.yaml|dir|dir|url} 
+kubectl replace -f {file.yaml|dir|dir|url}
+kubectl diff -f {file.yaml|dir|dir|url} # diff between existing new one to be applied
 kubectl annotate deployment/nginx kubernetes.io/change-cause="initial version"
 kubectl expose deploy/{name} --type=NodePort
 kubectl expose deploy/{name} --type=LoadBalancer --port 80 --target-port 8080
 kubectl get svc, endpoints -o wide
-kubectl rollout status deploy/{name}
-kubectl rollout history deploy/{name}
+kubectl rollout {status|history|undo} deploy/{name}
 kubectl rollout undo deploy/{name} --to-revision=2
-kubectl replace -f {file}
-kubectl diff -f {file|dir}
-kubectl get events --sort-by=.lastTimestamp
+kubectl events {pod|rs|deploy|svc}--sort-by=.lastTimestamp --watch --type=warnings
 kubectl port-forward svc/{service_name} 8080:80
 kubectl port-forward pod/nginx 8080:80
 kubectl cp {ns}/{pod}:/path/in/pod ./local/dir
 kubectl scale deploy/{name} --replicas=3
 kubectl get role,rolebinding -n demo
-kubectl create role red-pods --verb=get,list,watch --resource=pods -n demo
-kubectl create rolebinding red-pods --role=red-pods --serviceaccount=demo:default -n demo
-kubectl auth can-i list pods --as system:serviceaccount:demo:default -n demo
 </code></pre>
 <h4>CronJobs & Jobs</h4>
 <pre><button class="copy-btn">Copy</button><code>
@@ -448,9 +441,8 @@ kubectl delete job/{name} cronjob/{name}
 kubectl cordon {node}
 kubectl drain {node} --ignore-daemonsets --delete-emptydir-data
 kubectl uncordon {node}
-kubectl taint nodes {node} key=value:NoSchedule
+kubectl taint nodes {node} key=value:{noSchedule|noExecute|preferNoSchedule}
 kubectl label node {node} pool=blue --overwrite
-kubectl top nodes
 kubectl top pods -A
 </code></pre>
 <h4>ConfigMaps & Secrets</h4>
@@ -479,13 +471,9 @@ kubectl logs --since=1h nginx
 KUBECONFIG={file} kubectl config view --raw
 kubectl get clusterrolebindings
 kubectl describe clusterrole/cluster-admin
-kubectl create clusterrole cluster-superhero --verb='' --resource=''
+kubectl create role red-pods --verb=get,list,watch --resource=pods -n demo
 kubectl create clusterrolebinding cluster-superhero --cluster-role=cluster-superhero --group=cluster-superheroes
-kubectl auth can-i '' ''
 kubectl auth can-i '' '' --as-group=cluster-superheroes --as="superman"</code></pre>
-
-    <h3 id="services">Services</h3>
-    <p>Types: ClusterIP, NodePort, LoadBalancer, ExternalName (plus headless Service with no cluster IP)</p>
     <h3 id="labels">Labels & Selectors</h3>
     <ul><li>Metadata for resources; used by Services, NetworkPolicies, rollouts, monitoring, and cost tools</li></ul>
     <pre><button class="copy-btn">Copy</button><code>kubectl get all --selector=&lt;label&gt;=&lt;value&gt;</code></pre>
@@ -577,45 +565,6 @@ kubectl cordon {node}
 kubectl drain {node} --ignore-daemonsets --delete-emptydir-data
 kubectl uncordon {node}
 kubectl create pdb nginx --selector=app=nginx --min-available=2
-</code></pre>
-<h3 id="scheduling-objects">Scheduling: Selectors, Affinity, Taints</h3>
-
-    <pre><button class="copy-btn">Copy</button><code>kubectl taint node worker region=useast2:NoSchedule</code></pre>
-
-
-    <h3 id="statefulset-highlights">StatefulSet highlights</h3>
-    <pre><button class="copy-btn">Copy</button><code>
-      apiVersion: apps/v1
-      kind: StatefulSet
-      metadata:
-      name: web
-      spec:
-      serviceName: web
-      replicas: 3
-      selector:
-      matchLabels: { app: web }
-      updateStrategy:
-      type: RollingUpdate
-      template:
-      metadata: { labels: { app: web } }
-      spec:
-      containers:
-      - name: app
-      image: nginx:stable
-      ports: [{ name: http, containerPort: 80 }]
-      volumeMounts:
-      - name: data
-      mountPath: /var/www
-      volumeClaimTemplates:
-
-      metadata:
-      name: data
-      spec:
-      accessModes: ["ReadWriteOnce"]
-      storageClassName: fast
-      resources:
-      requests:
-      storage: 5Gi
 </code></pre>
   </section>
   <!-- Helm -->
